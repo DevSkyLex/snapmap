@@ -2,12 +2,9 @@ import { Component, inject, Input } from '@angular/core';
 import {
   IonButton,
   IonButtons,
-  IonCol,
   IonContent,
-  IonGrid,
   IonHeader,
   IonIcon,
-  IonRow,
   IonTitle,
   IonToolbar,
   ModalController,
@@ -33,18 +30,7 @@ import type { UserPhoto } from '@features/photos/models';
   selector: 'app-cluster-modal',
   templateUrl: 'cluster-modal.component.html',
   styleUrls: ['cluster-modal.component.scss'],
-  imports: [
-    IonHeader,
-    IonToolbar,
-    IonTitle,
-    IonButtons,
-    IonButton,
-    IonContent,
-    IonIcon,
-    IonGrid,
-    IonRow,
-    IonCol,
-  ],
+  imports: [IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonContent, IonIcon],
 })
 export class ClusterModalComponent {
   //#region Inputs

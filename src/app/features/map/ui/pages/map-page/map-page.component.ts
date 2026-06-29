@@ -9,7 +9,6 @@ import {
 import {
   IonContent,
   IonHeader,
-  IonSpinner,
   IonTitle,
   IonToolbar,
   ModalController,
@@ -40,7 +39,7 @@ import type { PhotoLibrary, UserPhoto } from '@features/photos';
   selector: 'app-map',
   templateUrl: 'map-page.component.html',
   styleUrls: ['map-page.component.scss'],
-  imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonSpinner],
+  imports: [IonHeader, IonToolbar, IonTitle, IonContent],
 })
 export class MapPageComponent implements AfterViewInit, OnDestroy {
   //#region Properties

@@ -1,8 +1,10 @@
-<ion-header>
-  <ion-toolbar color="dark">
-    <ion-title>{{ current() + 1 }} / {{ photos.length }}</ion-title>
+<ion-header class="detail-header">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <span class="counter">{{ current() + 1 }} / {{ photos.length }}</span>
+    </ion-buttons>
     <ion-buttons slot="end">
-      <ion-button (click)="dismiss()">
+      <ion-button class="round" fill="clear" aria-label="Fermer" (click)="dismiss()">
         <ion-icon slot="icon-only" name="close"></ion-icon>
       </ion-button>
     </ion-buttons>
@@ -19,25 +21,27 @@
   </div>
 </ion-content>
 
-<ion-footer>
-  <ion-toolbar color="dark">
+<ion-footer class="detail-footer">
+  <ion-toolbar>
     <div class="meta">
-      <div class="meta-row">
+      <span class="chip">
         <ion-icon name="calendar"></ion-icon>
-        <span>{{ photo.date | date: 'dd/MM/yyyy à HH:mm' }}</span>
-      </div>
-      <div class="meta-row">
+        <span>{{ photo.date | date: 'dd/MM/yyyy · HH:mm' }}</span>
+      </span>
+      <span class="chip loc">
         <ion-icon name="location"></ion-icon>
         <span>{{ photo.locationName || 'Localisation…' }}</span>
-      </div>
+      </span>
     </div>
     <ion-buttons slot="end">
-      <ion-button (click)="toggleLike()">
-        <ion-icon
-          slot="icon-only"
-          [name]="photo.liked ? 'heart' : 'heart-outline'"
-          [color]="photo.liked ? 'danger' : 'light'"
-        ></ion-icon>
+      <ion-button
+        class="like-btn"
+        [class.liked]="photo.liked"
+        fill="clear"
+        aria-label="Aimer la photo"
+        (click)="toggleLike()"
+      >
+        <ion-icon slot="icon-only" [name]="photo.liked ? 'heart' : 'heart-outline'"></ion-icon>
       </ion-button>
     </ion-buttons>
   </ion-toolbar>

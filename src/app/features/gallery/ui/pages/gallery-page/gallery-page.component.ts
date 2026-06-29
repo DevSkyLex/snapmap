@@ -1,20 +1,24 @@
 import { Component, inject, type OnInit } from '@angular/core';
 import {
   IonButton,
-  IonCol,
   IonContent,
   IonFab,
   IonFabButton,
-  IonGrid,
   IonHeader,
   IonIcon,
-  IonRow,
-  IonTitle,
   IonToolbar,
   ModalController,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { camera, heart, heartOutline, trash } from 'ionicons/icons';
+import {
+  arrowDown,
+  camera,
+  heart,
+  heartOutline,
+  imagesOutline,
+  location,
+  trash,
+} from 'ionicons/icons';
 import { FeedbackService } from '@core/feedback';
 import { PermissionsService } from '@core/permissions';
 import { PHOTO_LIBRARY, PhotoDetailComponent } from '@features/photos';
@@ -41,14 +45,10 @@ import { SkeletonCardComponent } from '@shared/components';
   imports: [
     IonHeader,
     IonToolbar,
-    IonTitle,
     IonContent,
     IonFab,
     IonFabButton,
     IonIcon,
-    IonGrid,
-    IonRow,
-    IonCol,
     IonButton,
     SkeletonCardComponent,
   ],
@@ -124,7 +124,7 @@ export class GalleryPageComponent implements OnInit {
    * @since 1.0.0
    */
   public constructor() {
-    addIcons({ camera, heart, heartOutline, trash });
+    addIcons({ arrowDown, camera, heart, heartOutline, imagesOutline, location, trash });
   }
   //#endregion
 

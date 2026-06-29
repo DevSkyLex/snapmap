@@ -17,7 +17,6 @@ import {
   IonFooter,
   IonHeader,
   IonIcon,
-  IonTitle,
   IonToolbar,
   ModalController,
 } from '@ionic/angular/standalone';
@@ -45,17 +44,7 @@ import type { PhotoLibrary } from '@features/photos/ports/photo-library';
   selector: 'app-photo-detail',
   templateUrl: 'photo-detail.component.html',
   styleUrls: ['photo-detail.component.scss'],
-  imports: [
-    IonHeader,
-    IonToolbar,
-    IonTitle,
-    IonButtons,
-    IonButton,
-    IonContent,
-    IonIcon,
-    IonFooter,
-    DatePipe,
-  ],
+  imports: [IonHeader, IonToolbar, IonButtons, IonButton, IonContent, IonIcon, IonFooter, DatePipe],
 })
 export class PhotoDetailComponent implements OnInit {
   //#region Inputs

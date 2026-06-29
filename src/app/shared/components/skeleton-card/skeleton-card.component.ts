@@ -1,35 +1,55 @@
 import { Component } from '@angular/core';
-import { IonSkeletonText } from '@ionic/angular/standalone';
 
 /**
  * Component SkeletonCardComponent
  * @class SkeletonCardComponent
  *
  * @description
- * Generic, domain-agnostic UI primitive: a square skeleton card shown during a
- * loading state (challenge 4). No feature coupling.
+ * Generic, domain-agnostic UI primitive: a square shimmering placeholder shown
+ * during a loading state (challenge 4). No feature coupling. The shimmer sweeps
+ * a gradient and collapses to a static surface under reduced-motion.
  *
- * @version 1.0.0
+ * @version 1.1.0
  *
  * @author Valentin FORTIN <contact@valentin-fortin.pro>
  */
 @Component({
   selector: 'app-skeleton-card',
-  template: `<div class="skeleton"><ion-skeleton-text [animated]="true"></ion-skeleton-text></div>`,
+  template: `<div class="skeleton"></div>`,
   styles: [
     `
+      :host {
+        display: block;
+      }
+
       .skeleton {
         aspect-ratio: 1;
-        border-radius: 8px;
-        overflow: hidden;
+        border-radius: var(--radius-lg, 16px);
+        background: linear-gradient(
+          100deg,
+          var(--surface, #17151f) 30%,
+          var(--surface-2, #201d2b) 50%,
+          var(--surface, #17151f) 70%
+        );
+        background-size: 200% 100%;
+        animation: skeleton-shimmer 1.3s ease infinite;
       }
-      ion-skeleton-text {
-        width: 100%;
-        height: 100%;
-        margin: 0;
+
+      @keyframes skeleton-shimmer {
+        from {
+          background-position: 200% 0;
+        }
+        to {
+          background-position: -200% 0;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .skeleton {
+          animation: none;
+        }
       }
     `,
   ],
-  imports: [IonSkeletonText],
 })
 export class SkeletonCardComponent {}

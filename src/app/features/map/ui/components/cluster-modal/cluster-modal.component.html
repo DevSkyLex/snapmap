@@ -1,8 +1,8 @@
 <ion-header>
-  <ion-toolbar color="primary">
+  <ion-toolbar>
     <ion-title>{{ photos.length }} photos ici</ion-title>
     <ion-buttons slot="end">
-      <ion-button (click)="dismiss()">
+      <ion-button class="round" fill="clear" aria-label="Fermer" (click)="dismiss()">
         <ion-icon slot="icon-only" name="close"></ion-icon>
       </ion-button>
     </ion-buttons>
@@ -10,15 +10,11 @@
 </ion-header>
 
 <ion-content>
-  <ion-grid>
-    <ion-row>
-      @for (photo of photos; track photo.id) {
-        <ion-col size="4">
-          <div class="thumb" (click)="open(photo)">
-            <img [src]="photo.webviewPath" alt="Photo" />
-          </div>
-        </ion-col>
-      }
-    </ion-row>
-  </ion-grid>
+  <div class="thumb-grid">
+    @for (photo of photos; track photo.id) {
+      <div class="thumb" (click)="open(photo)">
+        <img [src]="photo.webviewPath" alt="Photo" loading="lazy" />
+      </div>
+    }
+  </div>
 </ion-content>

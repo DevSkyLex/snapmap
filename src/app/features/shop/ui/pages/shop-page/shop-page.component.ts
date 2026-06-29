@@ -1,17 +1,14 @@
 import { Component, inject, type OnInit } from '@angular/core';
 import {
   IonButton,
-  IonCol,
   IonContent,
-  IonGrid,
   IonHeader,
   IonIcon,
-  IonRow,
   IonTitle,
   IonToolbar,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { lockClosed, lockOpen } from 'ionicons/icons';
+import { bagHandleOutline, cardOutline, lockClosed, lockOpen } from 'ionicons/icons';
 import { FeedbackService } from '@core/feedback';
 import { PHOTO_LIBRARY } from '@features/photos';
 import type { PhotoLibrary } from '@features/photos';
@@ -34,17 +31,7 @@ import { PaymentService } from '@features/shop/services/payment/payment.service'
   selector: 'app-shop',
   templateUrl: 'shop-page.component.html',
   styleUrls: ['shop-page.component.scss'],
-  imports: [
-    IonHeader,
-    IonToolbar,
-    IonTitle,
-    IonContent,
-    IonGrid,
-    IonRow,
-    IonCol,
-    IonIcon,
-    IonButton,
-  ],
+  imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonIcon, IonButton],
 })
 export class ShopPageComponent implements OnInit {
   //#region Properties
@@ -103,7 +90,7 @@ export class ShopPageComponent implements OnInit {
    * @since 1.0.0
    */
   public constructor() {
-    addIcons({ lockClosed, lockOpen });
+    addIcons({ bagHandleOutline, cardOutline, lockClosed, lockOpen });
   }
   //#endregion
 

@@ -13,9 +13,42 @@
 .loading-ctn {
   position: absolute;
   inset: 0;
-  z-index: 5;
+  z-index: var(--z-sticky);
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
-  background: var(--ion-background-color, #fff);
+  justify-content: center;
+  gap: 16px;
+  background: var(--bg);
+
+  .loader-orb {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--grad);
+    box-shadow: var(--shadow-glow);
+    animation: orb-pulse 1.4s var(--ease) infinite;
+  }
+
+  p {
+    margin: 0;
+    color: var(--muted);
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+}
+
+@keyframes orb-pulse {
+  0%,
+  100% {
+    transform: scale(0.85);
+    opacity: 0.85;
+  }
+  50% {
+    transform: scale(1);
+    opacity: 1;
+    box-shadow:
+      0 0 0 14px rgba(124, 92, 252, 0.12),
+      var(--shadow-glow);
+  }
 }

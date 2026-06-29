@@ -1,51 +1,63 @@
 <ion-header [translucent]="true">
-  <ion-toolbar color="primary">
-    <ion-title>SnapMap</ion-title>
+  <ion-toolbar>
+    <div class="brand" slot="start">
+      <span class="brand-pin"><ion-icon name="location"></ion-icon></span>
+      SnapMap
+    </div>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-grid>
-    <ion-row>
-      @if (library.isCapturing()) {
-        <ion-col size="6">
-          <app-skeleton-card></app-skeleton-card>
-        </ion-col>
+  <div class="photo-grid">
+    @if (library.isCapturing()) {
+      <app-skeleton-card></app-skeleton-card>
+    }
+
+    @for (photo of library.photos(); track photo.id) {
+      <div class="photo-card" (click)="openDetail(photo)">
+        <img [src]="photo.webviewPath" alt="Photo" loading="lazy" />
+        <span class="scrim"></span>
+
+        <ion-button
+          class="action like"
+          [class.liked]="photo.liked"
+          fill="clear"
+          aria-label="Aimer la photo"
+          (click)="toggleLike(photo, $event)"
+        >
+          <ion-icon slot="icon-only" [name]="photo.liked ? 'heart' : 'heart-outline'"></ion-icon>
+        </ion-button>
+
+        <ion-button
+          class="action delete"
+          fill="clear"
+          aria-label="Supprimer la photo"
+          (click)="confirmDelete(photo, $event)"
+        >
+          <ion-icon slot="icon-only" name="trash"></ion-icon>
+        </ion-button>
+      </div>
+    } @empty {
+      @if (!library.isCapturing()) {
+        <div class="empty">
+          <span class="empty-icon"><ion-icon name="images-outline"></ion-icon></span>
+          <h2>Vos souvenirs commencent ici</h2>
+          <p>Prenez une photo : elle apparaîtra dans la galerie et sur la carte, géolocalisée.</p>
+          <span class="empty-hint">
+            <ion-icon name="arrow-down"></ion-icon>
+            Appuyez sur l'appareil photo
+          </span>
+        </div>
       }
-
-      @for (photo of library.photos(); track photo.id) {
-        <ion-col size="6">
-          <div class="photo-card" (click)="openDetail(photo)">
-            <img [src]="photo.webviewPath" alt="Photo" />
-
-            <ion-button class="action like" fill="clear" (click)="toggleLike(photo, $event)">
-              <ion-icon
-                slot="icon-only"
-                [name]="photo.liked ? 'heart' : 'heart-outline'"
-                [color]="photo.liked ? 'danger' : 'light'"
-              ></ion-icon>
-            </ion-button>
-
-            <ion-button class="action delete" fill="clear" (click)="confirmDelete(photo, $event)">
-              <ion-icon slot="icon-only" name="trash" color="light"></ion-icon>
-            </ion-button>
-          </div>
-        </ion-col>
-      } @empty {
-        @if (!library.isCapturing()) {
-          <ion-col size="12">
-            <p class="empty">
-              Aucune photo pour l'instant.<br />
-              Appuyez sur l'appareil photo pour commencer.
-            </p>
-          </ion-col>
-        }
-      }
-    </ion-row>
-  </ion-grid>
+    }
+  </div>
 
   <ion-fab vertical="bottom" horizontal="center" slot="fixed">
-    <ion-fab-button (click)="takePhoto()">
+    <ion-fab-button
+      [class.is-capturing]="library.isCapturing()"
+      aria-label="Prendre une photo"
+      (click)="takePhoto()"
+    >
       <ion-icon name="camera"></ion-icon>
     </ion-fab-button>
   </ion-fab>

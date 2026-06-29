@@ -1,5 +1,5 @@
 <ion-header [translucent]="true">
-  <ion-toolbar color="primary">
+  <ion-toolbar>
     <ion-title>Carte</ion-title>
   </ion-toolbar>
 </ion-header>
@@ -8,7 +8,8 @@
   <div class="map-ctn">
     @if (!mapLoaded()) {
       <div class="loading-ctn">
-        <ion-spinner></ion-spinner>
+        <span class="loader-orb"></span>
+        <p>Chargement de la carte…</p>
       </div>
     }
     <div id="map" class="map"></div>
