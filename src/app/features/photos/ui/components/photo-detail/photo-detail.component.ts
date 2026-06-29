@@ -1,5 +1,13 @@
 import { DatePipe } from '@angular/common';
-import { Component, ElementRef, inject, Input, type OnInit, ViewChild, ChangeDetectionStrategy } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  inject,
+  Input,
+  type OnInit,
+  ViewChild,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import {
   IonButton,
   IonButtons,

@@ -1,8 +1,10 @@
 {
   "name": "snapmap",
   "version": "0.0.1",
-  "author": "Ionic Framework",
+  "private": true,
+  "description": "An Ionic project",
   "homepage": "https://ionicframework.com/",
+  "author": "Ionic Framework",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
@@ -15,7 +17,6 @@
     "format": "oxfmt .",
     "format:check": "oxfmt --check ."
   },
-  "private": true,
   "dependencies": {
     "@angular/animations": "22.0.4",
     "@angular/common": "22.0.4",
@@ -45,12 +46,12 @@
     "zone.js": "~0.15.0"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "22.0.4",
     "@angular-eslint/builder": "20.7.0",
     "@angular-eslint/eslint-plugin": "20.7.0",
     "@angular-eslint/eslint-plugin-template": "20.7.0",
     "@angular-eslint/schematics": "20.7.0",
     "@angular-eslint/template-parser": "20.7.0",
+    "@angular/build": "^22.0.4",
     "@angular/cli": "22.0.4",
     "@angular/compiler-cli": "22.0.4",
     "@angular/language-service": "22.0.4",
@@ -75,6 +76,5 @@
     "oxfmt": "^0.56.0",
     "oxlint": "^1.71.0",
     "typescript": "~6.0.3"
-  },
-  "description": "An Ionic project"
+  }
 }

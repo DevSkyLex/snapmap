@@ -1,7 +1,7 @@
 # Architecture — SnapMap
 
 Architecture reprise du projet **fireguard-web** et adaptée à une app **Ionic/Capacitor**.
-Principes : *feature-first*, `core` = infrastructure uniquement, contrats publiés via **ports + tokens**,
+Principes : _feature-first_, `core` = infrastructure uniquement, contrats publiés via **ports + tokens**,
 unités au plus bas niveau, barrels comme seule surface publique.
 
 ## Couches
@@ -75,10 +75,10 @@ Même exigence que fireguard-web :
 
 ## Déviations assumées vs. fireguard-web
 
-| fireguard-web | SnapMap | Pourquoi |
-|---------------|---------|----------|
-| PrimeNG | **Ionic/Capacitor** | sujet du concours |
-| NgRx Signal Store | **signals Angular** dans les services | proportionné à la taille de l'app |
-| `HydraApiService` (API Platform) | **`HttpClient`** dans `data-access` | pas de backend Hydra (juste Stripe) |
-| SSR / Mercure / i18n | non repris | hors périmètre du concours |
-| `testing/` spec colocalisés | convention documentée, specs non fournies | app de concours sans tests existants |
+| fireguard-web                    | SnapMap                                   | Pourquoi                             |
+| -------------------------------- | ----------------------------------------- | ------------------------------------ |
+| PrimeNG                          | **Ionic/Capacitor**                       | sujet du concours                    |
+| NgRx Signal Store                | **signals Angular** dans les services     | proportionné à la taille de l'app    |
+| `HydraApiService` (API Platform) | **`HttpClient`** dans `data-access`       | pas de backend Hydra (juste Stripe)  |
+| SSR / Mercure / i18n             | non repris                                | hors périmètre du concours           |
+| `testing/` spec colocalisés      | convention documentée, specs non fournies | app de concours sans tests existants |

@@ -1,4 +1,10 @@
-import { type AfterViewInit, Component, inject, type OnDestroy, ChangeDetectionStrategy } from '@angular/core';
+import {
+  type AfterViewInit,
+  Component,
+  inject,
+  type OnDestroy,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import {
   IonContent,
   IonHeader,
