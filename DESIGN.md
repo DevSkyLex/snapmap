@@ -1,64 +1,61 @@
 # Design
 
-Système visuel de **SnapMap** — app mobile Ionic, registre _product_, direction **iOS récent +
-Instagram**, thème **adaptatif clair / sombre** (suit le réglage système).
+Système visuel de **SnapMap** — app mobile Ionic, registre _product_, direction **feed Instagram +
+iOS récent**, thème **adaptatif clair / sombre** (suit le réglage système). Référence : la vidéo de
+démo fournie par l'utilisateur (feed sombre, accent bleu, tab bar flottante).
 
 ## Theme
 
 Épuré, natif, photo-forward. UI quasi **monochrome** (noir/blanc/gris + hairlines) ; la **photo
-porte toute la couleur**. Le **dégradé Instagram** est strictement réservé aux moments de marque
-(pastille du logo, icône d'état vide). Clair = blanc façon feed Instagram ; sombre = **noir pur**
-(#000). Bascule automatique via `@media (prefers-color-scheme)`.
+porte toute la couleur**. Le **dégradé Instagram** est réservé à un seul moment de marque (icône
+d'état vide). Clair = blanc façon feed Instagram ; sombre = **noir pur** (#000). Bascule automatique
+via `@media (prefers-color-scheme)`. App forcée en **mode Ionic `ios`** sur toutes les plateformes.
 
 ## Color palette
 
 Tokens CSS exposés pour les deux thèmes (valeur sombre entre parenthèses).
 
-| Rôle                      | Token          | Clair (Sombre)                                                   |
-| ------------------------- | -------------- | ---------------------------------------------------------------- |
-| Fond app                  | `--bg`         | `#FFFFFF` (`#000000`)                                            |
-| Fond groupé / cellule     | `--bg-grouped` | `#FAFAFA` (`#0A0A0A`)                                            |
-| Texte primaire            | `--ink`        | `#000000` (`#FFFFFF`)                                            |
-| Texte secondaire          | `--secondary`  | `#6B6B6B` (`#A8A8A8`) — ≥4.5:1                                   |
-| Texte tertiaire           | `--tertiary`   | `#8E8E8E`                                                        |
-| Hairline                  | `--separator`  | `#DBDBDB` (`#262626`)                                            |
-| Accent (liens, primaires) | `--accent`     | `#0095F6` (bleu Instagram)                                       |
-| Like / danger             | `--like`       | `#ED4956` (rouge cœur Instagram)                                 |
-| Dégradé Instagram         | `--ig-grad`    | `linear-gradient(45deg,#feda75,#fa7e1e,#d62976,#962fbf,#4f5bd5)` |
-
-`--ig-grad` n'apparaît que sur la pastille de logo et l'icône d'état vide — jamais en texte
-(`background-clip:text` banni), jamais comme remplissage d'UI courant.
+| Rôle                        | Token          | Clair (Sombre)                                                   |
+| --------------------------- | -------------- | ---------------------------------------------------------------- |
+| Fond app                    | `--bg`         | `#FFFFFF` (`#000000`)                                            |
+| Fond groupé / cellule       | `--bg-grouped` | `#FAFAFA` (`#0A0A0A`)                                            |
+| Texte primaire              | `--ink`        | `#000000` (`#FFFFFF`)                                            |
+| Texte secondaire            | `--secondary`  | `#6B6B6B` (`#A8A8A8`) — ≥4.5:1                                   |
+| Hairline                    | `--separator`  | `#DBDBDB` (`#262626`)                                            |
+| Accent (Snap, onglet actif) | `--accent`     | `#0A84FF` (bleu iOS)                                             |
+| Like / danger               | `--like`       | `#ED4956`                                                        |
+| Acheté (badge)              | `--success`    | `#30D158` (vert iOS)                                             |
+| Dégradé marque (état vide)  | `--ig-grad`    | `linear-gradient(45deg,#feda75,#fa7e1e,#d62976,#962fbf,#4f5bd5)` |
 
 ## Typography
 
-**Police système** (`-apple-system` → SF Pro sur iOS) — pas de webfont, rendu 100 % natif. Titres
-de barre 17px/600, wordmark de marque 800 (tracking serré), secondaire en `--secondary`. Échelle
-rem fixe (registre product). App forcée en **mode Ionic `ios`** sur toutes les plateformes.
+**Police système** (`-apple-system` → SF Pro sur iOS) — pas de webfont, rendu natif. Titre de barre
+centré 17px/600, lieu de carte 600, date/secondaire en `--secondary`. Échelle rem fixe.
 
 ## Components
 
-- **Barres de nav** : compactes, translucides (`backdrop-filter` blur), hairline 0.5px. Galerie =
-  wordmark Instagram à gauche + bouton caméra à droite ; autres = titre centré iOS.
-- **Barre d'onglets** : translucide, hairline haute, icônes monochromes — **pleines à l'état actif,
-  contour sinon** (signature Instagram). Galerie / Carte / Boutique.
-- **Grille galerie** : **profil Instagram** — 3 colonnes carrées, gap 2px, bord-à-bord, sans
-  radius. Photo aimée → petit cœur en incrustation.
-- **Visualiseur photo** : plein écran **toujours sombre**, header/footer flottants ; barre
-  d'actions façon Instagram (cœur + corbeille) + lieu/date. Like et suppression vivent ici.
-- **Boutons** : primaire = **bleu Instagram** plein ; secondaire = surface neutre + hairline ;
-  pression = `opacity .6` (iOS).
-- **Boutique** : cartes nettes (hairline, rayon 14px), flou de verrouillage propre, prix +
-  « Carte » (bleu) / « Google Pay » (neutre), badge déverrouillé.
-- **États vides** : pastille dégradé Instagram + titre + sous-titre (+ CTA bleu sur la galerie).
-- **Carte / Skeleton** : spinner iOS monochrome ; shimmer neutre.
+- **Galerie = feed vertical** (façon Instagram) : carte = avatar rond + **lieu** (reverse geocoding)
+  - date → **grande photo arrondie** (4:5, rayon 18px) avec **cœur** en haut à droite (like) →
+    badge vert **« Acheté »** si l'image est débloquée.
+- **Bouton « Snap »** : pilule **bleue flottante** (caméra) centrée au-dessus de la tab bar — la
+  capture vit là.
+- **Barre d'onglets** : **flottante arrondie** translucide (style iOS 26), icônes monochromes
+  **pleines à l'actif** en **bleu** / contour sinon. Galerie / Carte / Boutique.
+- **Barre de nav** : translucide, titre **« SnapMap » centré**, hairline 0.5px.
+- **Visualiseur photo** : plein écran **toujours sombre** ; sous la photo, **lieu** + badge vert
+  « Achetée » + date, et la rangée d'actions **« J'aime » (cœur) + corbeille** (like et suppression
+  vivent ici).
+- **Boutique** : cartes nettes (hairline, rayon 14px), flou de verrouillage, prix + « Carte »
+  (bleu) / « Google Pay » (neutre) ; l'achat ouvre la **feuille Stripe native**.
+- **États vides** : pastille dégradé + titre + sous-titre + CTA bleu.
 
 ## Layout
 
-- Cellules galerie carrées 3 colonnes bord-à-bord ; cartes boutique 2 colonnes, gap 12px.
+- Feed une colonne, gap 22px, padding latéral 14px ; photo de carte 4:5.
 - Cibles tactiles ≥ 44px ; safe-area respectée (`viewport-fit=cover`).
-- Rayons : 8/12/14px ; hairlines 0.5px ; z-index sémantique.
+- Tab bar flottante + bouton Snap en `position: fixed` au-dessus.
 
 ## Motion
 
-120–250 ms, `ease-out`. Pression en `opacity`/`scale`, cœur qui « pop » au like, shimmer du
-skeleton, spinner de carte. Désactivé en fondu/instantané sous `prefers-reduced-motion: reduce`.
+120–250 ms, `ease-out`. Pression en `scale`/`opacity`, cœur qui « pop » au like, shimmer du
+skeleton, spinner de carte. Désactivé sous `prefers-reduced-motion: reduce`.

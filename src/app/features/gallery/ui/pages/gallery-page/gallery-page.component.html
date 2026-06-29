@@ -1,38 +1,65 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <div class="brand" slot="start">
-      <span class="brand-logo"><ion-icon name="location"></ion-icon></span>
-      SnapMap
-    </div>
-    <ion-buttons slot="end">
-      <ion-button aria-label="Prendre une photo" (click)="takePhoto()">
-        <ion-icon slot="icon-only" name="camera-outline"></ion-icon>
-      </ion-button>
-    </ion-buttons>
+    <ion-title>SnapMap</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
+<ion-content [fullscreen]="true">
   @if (library.photos().length || library.isCapturing()) {
-    <div class="photo-grid">
+    <div class="feed">
       @if (library.isCapturing()) {
-        <app-skeleton-card></app-skeleton-card>
+        <article class="post post--loading">
+          <app-skeleton-card></app-skeleton-card>
+        </article>
       }
 
       @for (photo of library.photos(); track photo.id) {
-        <button type="button" class="cell" (click)="openDetail(photo)">
-          <img [src]="photo.webviewPath" alt="Photo" loading="lazy" />
-          @if (photo.liked) {
-            <ion-icon class="liked-badge" name="heart" aria-label="Aimée"></ion-icon>
+        <article class="post">
+          <header class="post-head">
+            <img class="avatar" [src]="photo.webviewPath" alt="" />
+            <div class="who">
+              <span class="place">{{ photo.locationName || 'Position enregistrée' }}</span>
+              <span class="when">{{ photo.date | date: 'd MMM yyyy à HH:mm' }}</span>
+            </div>
+          </header>
+
+          <div class="post-photo" (click)="openDetail(photo)">
+            <img [src]="photo.webviewPath" alt="Photo" loading="lazy" />
+            <button
+              type="button"
+              class="like"
+              [class.liked]="photo.liked"
+              aria-label="Aimer la photo"
+              (click)="toggleLike(photo, $event)"
+            >
+              <ion-icon [name]="photo.liked ? 'heart' : 'heart-outline'"></ion-icon>
+            </button>
+          </div>
+
+          @if (photo.purchased) {
+            <div class="post-foot">
+              <span class="badge"><ion-icon name="checkmark-circle"></ion-icon> Acheté</span>
+            </div>
           }
-        </button>
+        </article>
       }
     </div>
+
+    <button
+      type="button"
+      class="snap-fab"
+      [class.busy]="library.isCapturing()"
+      aria-label="Prendre une photo"
+      (click)="takePhoto()"
+    >
+      <ion-icon name="camera"></ion-icon>
+      Snap
+    </button>
   } @else {
     <div class="empty">
       <span class="empty-icon"><ion-icon name="images-outline"></ion-icon></span>
       <h2>Vos souvenirs commencent ici</h2>
-      <p>Prenez une photo : elle apparaîtra ici et sur la carte, géolocalisée.</p>
+      <p>Prenez une photo : elle apparaîtra dans le feed et sur la carte, géolocalisée.</p>
       <ion-button class="btn-primary cta" (click)="takePhoto()">
         <ion-icon slot="start" name="camera"></ion-icon>
         Prendre une photo

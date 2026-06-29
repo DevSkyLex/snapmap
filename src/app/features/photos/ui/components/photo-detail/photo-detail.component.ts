@@ -22,7 +22,7 @@ import {
   ModalController,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { close, heart, heartOutline, location, trash } from 'ionicons/icons';
+import { checkmarkCircle, close, heart, heartOutline, trash } from 'ionicons/icons';
 import { FeedbackService } from '@core/feedback';
 import { GeocodingService } from '@core/geocoding';
 import type { UserPhoto } from '@features/photos/models';
@@ -200,7 +200,7 @@ export class PhotoDetailComponent implements OnInit {
    * @since 1.0.0
    */
   public constructor() {
-    addIcons({ close, heart, heartOutline, location, trash });
+    addIcons({ checkmarkCircle, close, heart, heartOutline, trash });
   }
   //#endregion
 

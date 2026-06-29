@@ -21,27 +21,30 @@
 
 <ion-footer class="detail-footer">
   <ion-toolbar>
-    <div class="bar">
+    <div class="info">
+      <div class="meta">
+        <div class="place-row">
+          <span class="place">{{ photo.locationName || 'Position enregistrée' }}</span>
+          @if (photo.purchased) {
+            <span class="badge"><ion-icon name="checkmark-circle"></ion-icon> Achetée</span>
+          }
+        </div>
+        <span class="date">{{ photo.date | date: 'd MMM yyyy à HH:mm' }}</span>
+      </div>
+
       <div class="actions">
+        <button type="button" class="act like" [class.liked]="photo.liked" (click)="toggleLike()">
+          <ion-icon [name]="photo.liked ? 'heart' : 'heart-outline'"></ion-icon>
+          <span>{{ photo.liked ? 'Aimée' : "J'aime" }}</span>
+        </button>
         <button
           type="button"
-          class="act"
-          [class.liked]="photo.liked"
-          aria-label="Aimer la photo"
-          (click)="toggleLike()"
+          class="act del"
+          aria-label="Supprimer la photo"
+          (click)="deletePhoto()"
         >
-          <ion-icon [name]="photo.liked ? 'heart' : 'heart-outline'"></ion-icon>
-        </button>
-        <button type="button" class="act" aria-label="Supprimer la photo" (click)="deletePhoto()">
           <ion-icon name="trash"></ion-icon>
         </button>
-      </div>
-      <div class="meta">
-        <span class="loc">
-          <ion-icon name="location"></ion-icon>
-          <span>{{ photo.locationName || 'Localisation…' }}</span>
-        </span>
-        <span class="date">{{ photo.date | date: 'dd/MM/yyyy · HH:mm' }}</span>
       </div>
     </div>
   </ion-toolbar>

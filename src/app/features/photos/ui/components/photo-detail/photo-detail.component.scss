@@ -3,8 +3,7 @@
   --background: #000000;
 }
 
-.detail-header ion-toolbar,
-.detail-footer ion-toolbar {
+.detail-header ion-toolbar {
   --background: transparent;
   --color: #fff;
   --border-width: 0;
@@ -21,8 +20,11 @@
   background: linear-gradient(to bottom, rgba(0, 0, 0, 0.55), transparent);
 }
 
-.detail-footer {
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.75), transparent);
+.detail-footer ion-toolbar {
+  --background: #000000;
+  --border-width: 0;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 
 ion-button.round {
@@ -64,74 +66,98 @@ ion-button.round {
   }
 }
 
-/* Barre d'actions façon Instagram */
-.bar {
+/* Bloc d'information sous la photo */
+.info {
   display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 4px 4px 6px;
-}
-
-.actions {
-  display: flex;
-  gap: 4px;
-}
-
-.act {
-  display: grid;
-  place-items: center;
-  width: 44px;
-  height: 44px;
-  padding: 0;
-  border: 0;
-  background: transparent;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 4px 8px 6px;
   color: #fff;
-  cursor: pointer;
-  transition: transform 0.12s var(--ease);
-
-  &:active {
-    transform: scale(0.88);
-  }
-
-  ion-icon {
-    font-size: 28px;
-  }
-
-  &.liked ion-icon {
-    color: var(--like);
-    animation: heart-pop 0.35s var(--ease);
-  }
 }
 
 .meta {
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  padding: 0 6px;
-  color: #fff;
+  gap: 3px;
+  min-width: 0;
 
-  .loc {
+  .place-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+  }
+
+  .place {
+    overflow: hidden;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .badge {
     display: inline-flex;
     align-items: center;
-    gap: 5px;
-    font-size: 0.9rem;
+    gap: 4px;
+    flex: none;
+    font-size: 0.82rem;
     font-weight: 600;
+    color: var(--success);
 
     ion-icon {
-      flex: none;
       font-size: 15px;
-    }
-
-    span {
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
     }
   }
 
   .date {
-    font-size: 0.78rem;
+    font-size: 0.82rem;
     color: rgba(255, 255, 255, 0.6);
+  }
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: none;
+}
+
+.act {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 40px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.12s var(--ease);
+
+  &:active {
+    transform: scale(0.94);
+  }
+
+  ion-icon {
+    font-size: 21px;
+  }
+
+  &.del {
+    padding: 0 11px;
+  }
+
+  &.liked {
+    color: var(--like);
+
+    ion-icon {
+      animation: heart-pop 0.35s var(--ease);
+    }
   }
 }
 
