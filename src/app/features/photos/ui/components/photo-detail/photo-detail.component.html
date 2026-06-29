@@ -1,0 +1,44 @@
+<ion-header>
+  <ion-toolbar color="dark">
+    <ion-title>{{ current + 1 }} / {{ photos.length }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismiss()">
+        <ion-icon slot="icon-only" name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="detail-content">
+  <div #track class="carousel" (scroll)="onScroll()">
+    @for (p of photos; track p.id) {
+      <div class="slide">
+        <img [src]="p.webviewPath" alt="Photo" />
+      </div>
+    }
+  </div>
+</ion-content>
+
+<ion-footer>
+  <ion-toolbar color="dark">
+    <div class="meta">
+      <div class="meta-row">
+        <ion-icon name="calendar"></ion-icon>
+        <span>{{ photo.date | date: 'dd/MM/yyyy à HH:mm' }}</span>
+      </div>
+      <div class="meta-row">
+        <ion-icon name="location"></ion-icon>
+        <span>{{ photo.locationName || 'Localisation…' }}</span>
+      </div>
+    </div>
+    <ion-buttons slot="end">
+      <ion-button (click)="toggleLike()">
+        <ion-icon
+          slot="icon-only"
+          [name]="photo.liked ? 'heart' : 'heart-outline'"
+          [color]="photo.liked ? 'danger' : 'light'"
+        ></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-footer>

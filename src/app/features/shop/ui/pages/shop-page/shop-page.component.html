@@ -1,0 +1,35 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="primary">
+    <ion-title>Boutique</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-grid>
+    <ion-row>
+      @for (photo of library.photos(); track photo.id) {
+        <ion-col size="6">
+          <div class="photo-card" [class.locked]="!photo.purchased">
+            <img [src]="photo.webviewPath" alt="Photo" />
+
+            @if (!photo.purchased) {
+              <div class="overlay">
+                <ion-icon name="lock-closed"></ion-icon>
+                <ion-button size="small" (click)="buyPhoto(photo.id)">Acheter 5 € (CB)</ion-button>
+                <ion-button size="small" color="dark" (click)="buyPhotoWithGooglePay(photo.id)">
+                  Google Pay
+                </ion-button>
+              </div>
+            } @else {
+              <ion-icon name="lock-open" class="unlocked-badge"></ion-icon>
+            }
+          </div>
+        </ion-col>
+      } @empty {
+        <ion-col size="12">
+          <p class="empty">Prenez d'abord des photos dans la galerie pour les revendre ici.</p>
+        </ion-col>
+      }
+    </ion-row>
+  </ion-grid>
+</ion-content>

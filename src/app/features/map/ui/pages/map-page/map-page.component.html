@@ -1,0 +1,16 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="primary">
+    <ion-title>Carte</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="map-ctn">
+    @if (!mapLoaded) {
+      <div class="loading-ctn">
+        <ion-spinner></ion-spinner>
+      </div>
+    }
+    <div id="map" class="map"></div>
+  </div>
+</ion-content>
