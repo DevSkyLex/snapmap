@@ -3,7 +3,8 @@ import {
   Component,
   inject,
   type OnDestroy,
-  ChangeDetectionStrategy,
+  signal,
+  type WritableSignal,
 } from '@angular/core';
 import {
   IonContent,
@@ -39,7 +40,6 @@ import type { PhotoLibrary, UserPhoto } from '@features/photos';
   selector: 'app-map',
   templateUrl: 'map-page.component.html',
   styleUrls: ['map-page.component.scss'],
-  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonSpinner],
 })
 export class MapPageComponent implements AfterViewInit, OnDestroy {
@@ -130,16 +130,18 @@ export class MapPageComponent implements AfterViewInit, OnDestroy {
 
   /**
    * Property mapLoaded
+   * @readonly
    *
    * @description
-   * Whether the map has finished its initial load (hides the spinner).
+   * Whether the map has finished its initial load (hides the spinner). Exposed
+   * as a signal so the view reacts under zoneless change detection.
    *
    * @access protected
    * @since 1.0.0
    *
-   * @type {boolean}
+   * @type {WritableSignal<boolean>}
    */
-  protected mapLoaded = false;
+  protected readonly mapLoaded: WritableSignal<boolean> = signal<boolean>(false);
   //#endregion
 
   //#region Lifecycle
@@ -178,7 +180,7 @@ export class MapPageComponent implements AfterViewInit, OnDestroy {
         'Vérifiez votre token Mapbox dans src/environments/environment.ts.',
       );
     } finally {
-      this.mapLoaded = true;
+      this.mapLoaded.set(true);
     }
   }
 

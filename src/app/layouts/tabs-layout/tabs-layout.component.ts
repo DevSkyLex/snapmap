@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy } from '@angular/core';
+import { Component } from '@angular/core';
 import { IonIcon, IonLabel, IonTabBar, IonTabButton, IonTabs } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { cart, images, map } from 'ionicons/icons';
@@ -18,7 +18,6 @@ import { cart, images, map } from 'ionicons/icons';
 @Component({
   selector: 'app-tabs-layout',
   templateUrl: 'tabs-layout.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [IonTabs, IonTabBar, IonTabButton, IonIcon, IonLabel],
 })
 export class TabsLayoutComponent {

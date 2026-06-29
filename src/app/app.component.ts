@@ -1,4 +1,4 @@
-import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Stripe } from '@capacitor-community/stripe';
 import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
 import { ENV_CONFIG } from '@core/config';
@@ -19,7 +19,6 @@ import type { EnvironmentConfig } from '@core/config';
 @Component({
   selector: 'app-root',
   template: `<ion-app><ion-router-outlet></ion-router-outlet></ion-app>`,
-  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [IonApp, IonRouterOutlet],
 })
 export class AppComponent {

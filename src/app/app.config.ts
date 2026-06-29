@@ -1,5 +1,5 @@
 import { provideHttpClient, withXhr } from '@angular/common/http';
-import { type ApplicationConfig } from '@angular/core';
+import { type ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
 import {
   PreloadAllModules,
   provideRouter,
@@ -29,6 +29,12 @@ import { routes } from './app.routes';
  */
 export const appConfig: ApplicationConfig = {
   providers: [
+    // Zone-based change detection with event coalescing. NOTE: @ionic/angular 8
+    // still relies on NgZone for its overlay/navigation promises (present(),
+    // onDidDismiss()…), so pure zoneless is not yet viable. The app is otherwise
+    // zoneless-ready (OnPush components + signals): switch this single line to
+    // `provideZonelessChangeDetection()` once Ionic ships zoneless support.
+    provideZoneChangeDetection({ eventCoalescing: true }),
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     provideIonicAngular(),
     provideRouter(routes, withPreloading(PreloadAllModules)),

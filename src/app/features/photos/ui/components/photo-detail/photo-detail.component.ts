@@ -1,12 +1,14 @@
 import { DatePipe } from '@angular/common';
 import {
+  ChangeDetectorRef,
   Component,
   ElementRef,
   inject,
   Input,
   type OnInit,
+  signal,
   ViewChild,
-  ChangeDetectionStrategy,
+  type WritableSignal,
 } from '@angular/core';
 import {
   IonButton,
@@ -43,7 +45,6 @@ import type { PhotoLibrary } from '@features/photos/ports/photo-library';
   selector: 'app-photo-detail',
   templateUrl: 'photo-detail.component.html',
   styleUrls: ['photo-detail.component.scss'],
-  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     IonHeader,
     IonToolbar,
@@ -101,16 +102,18 @@ export class PhotoDetailComponent implements OnInit {
 
   /**
    * Property current
+   * @readonly
    *
    * @description
-   * Index of the currently centered photo.
+   * Index of the currently centered photo. Exposed as a signal so the header
+   * counter and footer metadata react under zoneless change detection.
    *
    * @access protected
    * @since 1.0.0
    *
-   * @type {number}
+   * @type {WritableSignal<number>}
    */
-  protected current = 0;
+  protected readonly current: WritableSignal<number> = signal<number>(0);
 
   /**
    * Property geocoding
@@ -153,6 +156,21 @@ export class PhotoDetailComponent implements OnInit {
    * @type {ModalController}
    */
   private readonly modalController: ModalController = inject<ModalController>(ModalController);
+
+  /**
+   * Property changeDetector
+   * @readonly
+   *
+   * @description
+   * Change detector used to refresh the view after the asynchronous reverse
+   * geocoding resolves (no zone.js to trigger it under zoneless).
+   *
+   * @access private
+   * @since 1.0.0
+   *
+   * @type {ChangeDetectorRef}
+   */
+  private readonly changeDetector: ChangeDetectorRef = inject<ChangeDetectorRef>(ChangeDetectorRef);
   //#endregion
 
   //#region Constructor
@@ -185,7 +203,7 @@ export class PhotoDetailComponent implements OnInit {
    * @returns {void} Nothing.
    */
   public ngOnInit(): void {
-    this.current = this.startIndex;
+    this.current.set(this.startIndex);
     for (const photo of this.photos) void this.ensureLocation(photo);
     globalThis.setTimeout(() => this.scrollTo(this.startIndex), 60);
   }
@@ -204,7 +222,7 @@ export class PhotoDetailComponent implements OnInit {
    * @returns {UserPhoto} The centered photo.
    */
   protected get photo(): UserPhoto {
-    return this.photos[this.current] as UserPhoto;
+    return this.photos[this.current()] as UserPhoto;
   }
   //#endregion
 
@@ -226,8 +244,8 @@ export class PhotoDetailComponent implements OnInit {
     if (!element) return;
 
     const index: number = Math.round(element.scrollLeft / element.clientWidth);
-    if (index !== this.current && index >= 0 && index < this.photos.length) {
-      this.current = index;
+    if (index !== this.current() && index >= 0 && index < this.photos.length) {
+      this.current.set(index);
     }
   }
 
@@ -301,6 +319,7 @@ export class PhotoDetailComponent implements OnInit {
   private async ensureLocation(photo: UserPhoto): Promise<void> {
     if (photo.locationName || photo.lat === null || photo.lng === null) return;
     photo.locationName = await this.geocoding.reverseGeocode(photo.lng, photo.lat);
+    this.changeDetector.markForCheck();
   }
   //#endregion
 }

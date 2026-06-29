@@ -5,17 +5,7 @@
     "builtin": true,
     "browser": true
   },
-  "ignorePatterns": [
-    "dist/**",
-    "out-tsc/**",
-    ".angular/**",
-    "coverage/**",
-    "www/**",
-    "android/**",
-    "src/zone-flags.ts",
-    "src/polyfills.ts",
-    "src/test.ts"
-  ],
+  "ignorePatterns": ["dist/**", "out-tsc/**", ".angular/**", "coverage/**", "www/**", "android/**"],
   "categories": {
     "correctness": "error",
     "suspicious": "error",

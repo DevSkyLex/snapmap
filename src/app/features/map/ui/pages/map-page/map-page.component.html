@@ -6,7 +6,7 @@
 
 <ion-content [fullscreen]="true">
   <div class="map-ctn">
-    @if (!mapLoaded) {
+    @if (!mapLoaded()) {
       <div class="loading-ctn">
         <ion-spinner></ion-spinner>
       </div>

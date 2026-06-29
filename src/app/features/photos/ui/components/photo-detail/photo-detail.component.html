@@ -1,6 +1,6 @@
 <ion-header>
   <ion-toolbar color="dark">
-    <ion-title>{{ current + 1 }} / {{ photos.length }}</ion-title>
+    <ion-title>{{ current() + 1 }} / {{ photos.length }}</ion-title>
     <ion-buttons slot="end">
       <ion-button (click)="dismiss()">
         <ion-icon slot="icon-only" name="close"></ion-icon>

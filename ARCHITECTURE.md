@@ -67,6 +67,22 @@ src/app/
   `ignoreDeprecations: "6.0"` en attendant TypeScript 7.
 - Node requis ≥ **22.22.3** (contrainte d'Angular 22).
 
+## Détection de changement (zoneless-ready)
+
+L'app est écrite pour le **zoneless** : tous les composants sont en **`OnPush`**
+(le défaut Angular 22 — aucun `changeDetection` explicite) et **tout état de vue passe
+par des signals** (`mapLoaded`, `current`, état du `PhotoService`…), avec `markForCheck()`
+pour les rares mises à jour asynchrones hors signal (reverse geocoding du détail photo).
+
+La détection reste toutefois **pilotée par zone.js** —
+`provideZoneChangeDetection({ eventCoalescing: true })` dans `app.config.ts` — car
+**`@ionic/angular` 8 dépend encore de `NgZone`** (peer `zone.js`, présent sur toutes les
+versions, y compris les nightlies) : ses overlays et sa navigation
+(`present()`, `onDidDismiss()`, `ion-router-outlet`…) ne fonctionnent pas en zoneless pur.
+Le jour où Ionic publie le support zoneless, le passage se fait en **une ligne** :
+remplacer `provideZoneChangeDetection(...)` par `provideZonelessChangeDetection()` et
+retirer `zone.js` des `polyfills` (`angular.json`) et des dépendances.
+
 ## Qualité de code
 
 Même exigence que fireguard-web :

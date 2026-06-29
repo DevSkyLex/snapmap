@@ -1,4 +1,4 @@
-import { Component, inject, type OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject, type OnInit } from '@angular/core';
 import {
   IonButton,
   IonCol,
@@ -34,7 +34,6 @@ import { PaymentService } from '@features/shop/services/payment/payment.service'
   selector: 'app-shop',
   templateUrl: 'shop-page.component.html',
   styleUrls: ['shop-page.component.scss'],
-  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     IonHeader,
     IonToolbar,
