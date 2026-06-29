@@ -8,40 +8,39 @@
   @if (library.photos().length || library.isCapturing()) {
     <div class="feed">
       @if (library.isCapturing()) {
-        <article class="post post--loading">
+        <section class="post post--loading">
           <app-skeleton-card></app-skeleton-card>
-        </article>
+        </section>
       }
 
       @for (photo of library.photos(); track photo.id) {
-        <article class="post">
+        <section class="post" (click)="openDetail(photo)">
+          <img class="post-blur" [src]="photo.webviewPath" alt="" aria-hidden="true" />
+          <img class="post-bg" [src]="photo.webviewPath" alt="Photo" />
+          <span class="scrim scrim--top"></span>
+          <span class="scrim scrim--bottom"></span>
+
           <header class="post-head">
             <img class="avatar" [src]="photo.webviewPath" alt="" />
             <div class="who">
               <span class="place">{{ photo.locationName || 'Position enregistrée' }}</span>
               <span class="when">{{ photo.date | date: 'd MMM yyyy à HH:mm' }}</span>
+              @if (photo.purchased) {
+                <span class="badge"><ion-icon name="checkmark-circle"></ion-icon> Acheté</span>
+              }
             </div>
           </header>
 
-          <div class="post-photo" (click)="openDetail(photo)">
-            <img [src]="photo.webviewPath" alt="Photo" loading="lazy" />
-            <button
-              type="button"
-              class="like"
-              [class.liked]="photo.liked"
-              aria-label="Aimer la photo"
-              (click)="toggleLike(photo, $event)"
-            >
-              <ion-icon [name]="photo.liked ? 'heart' : 'heart-outline'"></ion-icon>
-            </button>
-          </div>
-
-          @if (photo.purchased) {
-            <div class="post-foot">
-              <span class="badge"><ion-icon name="checkmark-circle"></ion-icon> Acheté</span>
-            </div>
-          }
-        </article>
+          <button
+            type="button"
+            class="like"
+            [class.liked]="photo.liked"
+            aria-label="Aimer la photo"
+            (click)="toggleLike(photo, $event)"
+          >
+            <ion-icon [name]="photo.liked ? 'heart' : 'heart-outline'"></ion-icon>
+          </button>
+        </section>
       }
     </div>
 

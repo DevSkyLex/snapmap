@@ -34,9 +34,10 @@ centré 17px/600, lieu de carte 600, date/secondaire en `--secondary`. Échelle 
 
 ## Components
 
-- **Galerie = feed vertical** (façon Instagram) : carte = avatar rond + **lieu** (reverse geocoding)
-  - date → **grande photo arrondie** (4:5, rayon 18px) avec **cœur** en haut à droite (like) →
-    badge vert **« Acheté »** si l'image est débloquée.
+- **Galerie = feed plein écran** (façon TikTok/Snapchat) : **un élément = toute la hauteur**
+  (`100dvh`), défilement par à-coups (`scroll-snap-type: y mandatory`). Photo nette `contain` sur un
+  **fond flouté** qui remplit l'écran ; en haut avatar + **lieu** (reverse geocoding) + date + badge
+  vert **« Acheté »** ; **cœur** (like) en bas à droite. Scrims dégradés pour la lisibilité.
 - **Bouton « Snap »** : pilule **bleue flottante** (caméra) centrée au-dessus de la tab bar — la
   capture vit là.
 - **Barre d'onglets** : **flottante arrondie** translucide (style iOS 26), icônes monochromes
