@@ -1,4 +1,4 @@
-import { Component, inject, Input } from '@angular/core';
+import { Component, inject, Input, ChangeDetectionStrategy } from '@angular/core';
 import {
   IonButton,
   IonButtons,
@@ -33,6 +33,7 @@ import type { UserPhoto } from '@features/photos/models';
   selector: 'app-cluster-modal',
   templateUrl: 'cluster-modal.component.html',
   styleUrls: ['cluster-modal.component.scss'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     IonHeader,
     IonToolbar,

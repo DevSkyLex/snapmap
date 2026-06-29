@@ -1,4 +1,4 @@
-import { Component, inject, type OnInit } from '@angular/core';
+import { Component, inject, type OnInit, ChangeDetectionStrategy } from '@angular/core';
 import {
   IonButton,
   IonCol,
@@ -38,6 +38,7 @@ import { SkeletonCardComponent } from '@shared/components';
   selector: 'app-gallery',
   templateUrl: 'gallery-page.component.html',
   styleUrls: ['gallery-page.component.scss'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     IonHeader,
     IonToolbar,

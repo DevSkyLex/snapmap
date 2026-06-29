@@ -1,4 +1,4 @@
-import { type AfterViewInit, Component, inject, type OnDestroy } from '@angular/core';
+import { type AfterViewInit, Component, inject, type OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 import {
   IonContent,
   IonHeader,
@@ -33,6 +33,7 @@ import type { PhotoLibrary, UserPhoto } from '@features/photos';
   selector: 'app-map',
   templateUrl: 'map-page.component.html',
   styleUrls: ['map-page.component.scss'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonSpinner],
 })
 export class MapPageComponent implements AfterViewInit, OnDestroy {

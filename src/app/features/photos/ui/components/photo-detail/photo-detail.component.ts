@@ -1,5 +1,5 @@
 import { DatePipe } from '@angular/common';
-import { Component, ElementRef, inject, Input, type OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, inject, Input, type OnInit, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import {
   IonButton,
   IonButtons,
@@ -35,6 +35,7 @@ import type { PhotoLibrary } from '@features/photos/ports/photo-library';
   selector: 'app-photo-detail',
   templateUrl: 'photo-detail.component.html',
   styleUrls: ['photo-detail.component.scss'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     IonHeader,
     IonToolbar,

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { IonSkeletonText } from '@ionic/angular/standalone';
 
 /**
@@ -30,6 +30,7 @@ import { IonSkeletonText } from '@ionic/angular/standalone';
       }
     `,
   ],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [IonSkeletonText],
 })
 export class SkeletonCardComponent {}
