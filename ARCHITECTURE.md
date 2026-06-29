@@ -57,6 +57,16 @@ src/app/
 - **Ports & adaptateurs** : `PhotoService implements PhotoLibrary`, lié au token
   `PHOTO_LIBRARY` via `{ provide, useExisting }`. `gallery`/`map`/`shop` injectent le token.
 
+## Stack & build
+
+- **Angular 22** (standalone + signals), **TypeScript 6.0**, **Ionic 8**, **Capacitor 8**.
+- Builder **`@angular/build:application`** (esbuild/Vite) — la sortie est aplatie sur `www`
+  (`outputPath.browser: ""`) pour rester compatible avec `webDir: 'www'` de Capacitor.
+- `tsconfig` : `module: preserve` + `moduleResolution: bundler`, `target: es2022`.
+  `baseUrl` est conservé (requis par esbuild pour les alias de `paths`) avec
+  `ignoreDeprecations: "6.0"` en attendant TypeScript 7.
+- Node requis ≥ **22.22.3** (contrainte d'Angular 22).
+
 ## Qualité de code
 
 Même exigence que fireguard-web :
