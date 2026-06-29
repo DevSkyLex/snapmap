@@ -1,21 +1,17 @@
 .thumb-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-  padding: 14px;
+  gap: 2px;
 }
 
 .thumb {
   aspect-ratio: 1;
-  border-radius: var(--radius);
   overflow: hidden;
   cursor: pointer;
-  background: var(--surface);
-  box-shadow: var(--shadow-card);
-  transition: transform 0.15s var(--ease);
+  background: var(--bg-grouped);
 
-  &:active {
-    transform: scale(0.95);
+  &:active img {
+    opacity: 0.85;
   }
 
   img {
@@ -26,12 +22,11 @@
 }
 
 ion-button.round {
-  --background: var(--surface-2);
-  --background-activated: #2a2738;
   --color: var(--ink);
-  --border-radius: 50%;
-  --padding-start: 0;
-  --padding-end: 0;
-  width: 38px;
-  height: 38px;
+  --padding-start: 4px;
+  --padding-end: 4px;
+
+  ion-icon {
+    font-size: 24px;
+  }
 }

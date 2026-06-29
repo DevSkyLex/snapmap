@@ -36,7 +36,9 @@ export const appConfig: ApplicationConfig = {
     // `provideZonelessChangeDetection()` once Ionic ships zoneless support.
     provideZoneChangeDetection({ eventCoalescing: true }),
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
-    provideIonicAngular(),
+    // Force le rendu iOS sur toutes les plateformes (grands titres, toolbars,
+    // spinners… cohérents avec la direction « iOS récent ») — voir DESIGN.md.
+    provideIonicAngular({ mode: 'ios' }),
     provideRouter(routes, withPreloading(PreloadAllModules)),
     provideHttpClient(withXhr()),
 

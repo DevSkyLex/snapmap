@@ -1,69 +1,64 @@
 # Design
 
-Système visuel de **SnapMap** — app mobile Ionic, registre _product_, direction **social &
-vibrant** sur thème **sombre** avec accent **indigo électrique**.
+Système visuel de **SnapMap** — app mobile Ionic, registre _product_, direction **iOS récent +
+Instagram**, thème **adaptatif clair / sombre** (suit le réglage système).
 
 ## Theme
 
-Sombre forcé (`dark` toujours actif, pas de bascule système). Fond quasi-noir teinté indigo qui
-fait ressortir les photos ; une signature dégradé indigo→violet portée uniquement par les actions
-clés. Vibrant mais discipliné : surfaces calmes, couleur réservée au sens (actions, état actif,
-like).
+Épuré, natif, photo-forward. UI quasi **monochrome** (noir/blanc/gris + hairlines) ; la **photo
+porte toute la couleur**. Le **dégradé Instagram** est strictement réservé aux moments de marque
+(pastille du logo, icône d'état vide). Clair = blanc façon feed Instagram ; sombre = **noir pur**
+(#000). Bascule automatique via `@media (prefers-color-scheme)`.
 
 ## Color palette
 
-OKLCH à la conception, exposé en CSS custom properties (tokens) + variables Ionic.
+Tokens CSS exposés pour les deux thèmes (valeur sombre entre parenthèses).
 
-| Rôle                     | Token             | Valeur                                    |
-| ------------------------ | ----------------- | ----------------------------------------- |
-| Fond app                 | `--bg`            | `#0E0D14` (indigo-noir profond)           |
-| Surface (cartes, barres) | `--surface`       | `#17151F`                                 |
-| Surface élevée (modales) | `--surface-2`     | `#201D2B`                                 |
-| Bordure                  | `--border`        | `rgba(255,255,255,.08)`                   |
-| Texte primaire           | `--ink`           | `#F4F3FA`                                 |
-| Texte secondaire         | `--muted`         | `#B0ABC4` (≥4.5:1 sur surface)            |
-| Accent indigo            | `--accent`        | `#7C5CFC`                                 |
-| Accent clair (hover)     | `--accent-bright` | `#9B83FF`                                 |
-| Partenaire dégradé       | `--accent-2`      | `#B14EF0` (violet)                        |
-| Dégradé signature        | `--grad`          | `linear-gradient(135deg,#6D5DFB,#B14EF0)` |
-| Like / danger            | `--danger`        | `#FF4D6D` (rose vif)                      |
-| Succès                   | `--success`       | `#2DD4A7`                                 |
-| Warning                  | `--warning`       | `#FFB020`                                 |
+| Rôle                      | Token          | Clair (Sombre)                                                   |
+| ------------------------- | -------------- | ---------------------------------------------------------------- |
+| Fond app                  | `--bg`         | `#FFFFFF` (`#000000`)                                            |
+| Fond groupé / cellule     | `--bg-grouped` | `#FAFAFA` (`#0A0A0A`)                                            |
+| Texte primaire            | `--ink`        | `#000000` (`#FFFFFF`)                                            |
+| Texte secondaire          | `--secondary`  | `#6B6B6B` (`#A8A8A8`) — ≥4.5:1                                   |
+| Texte tertiaire           | `--tertiary`   | `#8E8E8E`                                                        |
+| Hairline                  | `--separator`  | `#DBDBDB` (`#262626`)                                            |
+| Accent (liens, primaires) | `--accent`     | `#0095F6` (bleu Instagram)                                       |
+| Like / danger             | `--like`       | `#ED4956` (rouge cœur Instagram)                                 |
+| Dégradé Instagram         | `--ig-grad`    | `linear-gradient(45deg,#feda75,#fa7e1e,#d62976,#962fbf,#4f5bd5)` |
 
-Le dégradé signature ne s'applique qu'au FAB, aux boutons primaires, à l'indicateur d'onglet actif
-et aux accents de marque — jamais en texte (`background-clip:text` banni).
+`--ig-grad` n'apparaît que sur la pastille de logo et l'icône d'état vide — jamais en texte
+(`background-clip:text` banni), jamais comme remplissage d'UI courant.
 
 ## Typography
 
-Une seule famille : **Plus Jakarta Sans** (Google Fonts, poids 400/500/600/700/800) — géométrique
-humaniste, moderne et chaleureuse, adaptée au « social ». Échelle rem fixe (registre product),
-ratio ~1.2. Wordmark « SnapMap » en 800, tracking serré (≥ -0.02em). Pas de pairing de polices.
+**Police système** (`-apple-system` → SF Pro sur iOS) — pas de webfont, rendu 100 % natif. Titres
+de barre 17px/600, wordmark de marque 800 (tracking serré), secondaire en `--secondary`. Échelle
+rem fixe (registre product). App forcée en **mode Ionic `ios`** sur toutes les plateformes.
 
 ## Components
 
-- **Boutons** : primaire = dégradé signature, texte blanc, rayon 12px, pression `scale(.96)`.
-  Secondaire = surface + bordure. Boutons icône = cercle frosté (`backdrop-filter`) sur les photos.
-- **Cartes photo** : rayon 16px, ratio 1:1, `object-fit:cover`, voile dégradé bas pour la
-  lisibilité des actions, pression `scale(.97)`. Pas d'ombre « ghost-card » (jamais bordure 1px +
-  grosse ombre ensemble).
-- **FAB capture** : 64px, dégradé signature, halo doux indigo, pression + pulse à la capture.
-- **Barre d'onglets** : surface sombre, bordure haute subtile, onglet actif en indigo avec petit
-  indicateur ; inactifs en `--muted`.
-- **En-têtes** : toolbar transparente/sombre avec bordure basse fine (pas de barre bleue pleine) ;
-  titre de marque à gauche, gros et net.
-- **États vides** : icône en pastille dégradée + titre + sous-titre + indice vers le FAB.
-- **Skeleton** : shimmer (dégradé qui balaie), pas de spinner dans le contenu.
-- **Like** : cœur qui « pop » (scale + teinte rose) au tap.
+- **Barres de nav** : compactes, translucides (`backdrop-filter` blur), hairline 0.5px. Galerie =
+  wordmark Instagram à gauche + bouton caméra à droite ; autres = titre centré iOS.
+- **Barre d'onglets** : translucide, hairline haute, icônes monochromes — **pleines à l'état actif,
+  contour sinon** (signature Instagram). Galerie / Carte / Boutique.
+- **Grille galerie** : **profil Instagram** — 3 colonnes carrées, gap 2px, bord-à-bord, sans
+  radius. Photo aimée → petit cœur en incrustation.
+- **Visualiseur photo** : plein écran **toujours sombre**, header/footer flottants ; barre
+  d'actions façon Instagram (cœur + corbeille) + lieu/date. Like et suppression vivent ici.
+- **Boutons** : primaire = **bleu Instagram** plein ; secondaire = surface neutre + hairline ;
+  pression = `opacity .6` (iOS).
+- **Boutique** : cartes nettes (hairline, rayon 14px), flou de verrouillage propre, prix +
+  « Carte » (bleu) / « Google Pay » (neutre), badge déverrouillé.
+- **États vides** : pastille dégradé Instagram + titre + sous-titre (+ CTA bleu sur la galerie).
+- **Carte / Skeleton** : spinner iOS monochrome ; shimmer neutre.
 
 ## Layout
 
-- Grille photo : 2 colonnes, gap 10px, padding latéral 12px (mobile-first, une main).
+- Cellules galerie carrées 3 colonnes bord-à-bord ; cartes boutique 2 colonnes, gap 12px.
 - Cibles tactiles ≥ 44px ; safe-area respectée (`viewport-fit=cover`).
-- Échelle de rayons : 10/12/16px (cartes ≤16px), pills pour tags/compteurs.
-- Z-index sémantique : contenu < sticky < backdrop < modal < toast.
+- Rayons : 8/12/14px ; hairlines 0.5px ; z-index sémantique.
 
 ## Motion
 
-150–250 ms, `ease-out` (quart/expo). Pression sur tout élément tactile, like qui pop, FAB pulse à
-la capture, shimmer du skeleton, fondu d'entrée des cartes (léger, échelonné). Tout est désactivé
-en fondu/instantané sous `prefers-reduced-motion: reduce`.
+120–250 ms, `ease-out`. Pression en `opacity`/`scale`, cœur qui « pop » au like, shimmer du
+skeleton, spinner de carte. Désactivé en fondu/instantané sous `prefers-reduced-motion: reduce`.

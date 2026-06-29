@@ -1,7 +1,8 @@
 /* ============================================================================
  * SnapMap — feuille de styles globale
- * Thème sombre « social & vibrant », accent indigo électrique.
- * Voir DESIGN.md pour le système complet.
+ * Style iOS récent + Instagram, thème adaptatif clair / sombre.
+ * UI monochrome, hairlines, dégradé Instagram réservé aux moments de marque.
+ * Voir DESIGN.md.
  * ========================================================================== */
 
 /* Core CSS requis par Ionic */
@@ -22,36 +23,46 @@
 @import 'mapbox-gl/dist/mapbox-gl.css';
 
 /* ----------------------------------------------------------------------------
- * 1. Tokens de design
+ * 1. Tokens + thème clair (par défaut)
  * ------------------------------------------------------------------------- */
 :root {
-  --bg: #0e0d14;
-  --surface: #17151f;
-  --surface-2: #201d2b;
-  --border: rgba(255, 255, 255, 0.08);
-  --border-strong: rgba(255, 255, 255, 0.14);
-  --ink: #f4f3fa;
-  --muted: #b0abc4;
-  --faint: #837e9a;
+  --font:
+    -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', 'Segoe UI', roboto,
+    helvetica, arial, sans-serif;
 
-  --accent: #7c5cfc;
-  --accent-bright: #9b83ff;
-  --accent-2: #b14ef0;
-  --grad: linear-gradient(135deg, #6d5dfb, #b14ef0);
-  --grad-active: linear-gradient(135deg, #5d4deb, #a13ee0);
-  --grad-hover: linear-gradient(135deg, #7d6dff, #c15eff);
-  --grad-soft: linear-gradient(135deg, rgba(109, 93, 251, 0.16), rgba(177, 78, 240, 0.16));
+  /* surfaces */
+  --bg: #ffffff;
+  --bg-elevated: #ffffff;
+  --bg-grouped: #fafafa;
 
-  --danger: #ff4d6d;
-  --success: #2dd4a7;
-  --warning: #ffb020;
+  /* texte */
+  --ink: #000000;
+  --secondary: #6b6b6b; /* ≥4.5:1 sur blanc */
+  --tertiary: #8e8e8e; /* gris Instagram, gros texte/icônes */
 
-  --radius-sm: 10px;
+  /* séparateurs */
+  --separator: #dbdbdb; /* hairline Instagram */
+  --separator-strong: #c7c7c7;
+
+  /* couleurs sémantiques */
+  --accent: #0095f6; /* bleu Instagram (liens, primaires) */
+  --accent-press: #1877f2;
+  --like: #ed4956; /* rouge cœur Instagram */
+
+  /* dégradé Instagram — réservé aux moments de marque */
+  --ig-grad: linear-gradient(45deg, #feda75, #fa7e1e, #d62976, #962fbf, #4f5bd5);
+
+  /* matériaux iOS */
+  --nav-bg: rgba(255, 255, 255, 0.82);
+  --tabbar-bg: rgba(255, 255, 255, 0.92);
+  --blur: saturate(180%) blur(20px);
+  --overlay-strong: rgba(0, 0, 0, 0.5);
+
+  --radius-sm: 8px;
   --radius: 12px;
-  --radius-lg: 16px;
+  --radius-lg: 14px;
 
-  --shadow-glow: 0 12px 30px -8px rgba(124, 92, 252, 0.6);
-  --shadow-card: 0 10px 26px -14px rgba(0, 0, 0, 0.75);
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
 
   /* échelle z sémantique */
   --z-sticky: 10;
@@ -59,79 +70,94 @@
   --z-modal: 110;
   --z-toast: 120;
 
-  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  /* --- variables Ionic (clair) --- */
+  --ion-font-family: var(--font);
+  --ion-background-color: #ffffff;
+  --ion-background-color-rgb: 255, 255, 255;
+  --ion-text-color: #000000;
+  --ion-text-color-rgb: 0, 0, 0;
+
+  --ion-toolbar-background: var(--nav-bg);
+  --ion-tab-bar-background: var(--tabbar-bg);
+  --ion-item-background: #ffffff;
+  --ion-card-background: #ffffff;
+  --ion-overlay-background-color: #ffffff;
+
+  --ion-color-primary: #0095f6;
+  --ion-color-primary-rgb: 0, 149, 246;
+  --ion-color-primary-contrast: #ffffff;
+  --ion-color-primary-contrast-rgb: 255, 255, 255;
+  --ion-color-primary-shade: #0084d8;
+  --ion-color-primary-tint: #1aa0f7;
+
+  --ion-color-danger: #ed4956;
+  --ion-color-danger-rgb: 237, 73, 86;
+  --ion-color-danger-contrast: #ffffff;
+  --ion-color-danger-contrast-rgb: 255, 255, 255;
+  --ion-color-danger-shade: #d1404c;
+  --ion-color-danger-tint: #ef5b67;
+
+  --ion-color-medium: #8e8e8e;
+  --ion-color-medium-rgb: 142, 142, 142;
 }
 
 /* ----------------------------------------------------------------------------
- * 2. Thème Ionic — sombre forcé, accent indigo
+ * 2. Thème sombre (noir pur, façon Instagram / iOS dark)
  * ------------------------------------------------------------------------- */
-:root {
-  --ion-font-family:
-    'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', roboto, sans-serif;
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #000000;
+    --bg-elevated: #121212;
+    --bg-grouped: #0a0a0a;
 
-  --ion-background-color: #0e0d14;
-  --ion-background-color-rgb: 14, 13, 20;
-  --ion-text-color: #f4f3fa;
-  --ion-text-color-rgb: 244, 243, 250;
+    --ink: #ffffff;
+    --secondary: #a8a8a8;
+    --tertiary: #8e8e8e;
 
-  --ion-toolbar-background: rgba(14, 13, 20, 0.72);
-  --ion-toolbar-color: #f4f3fa;
-  --ion-tab-bar-background: #14131c;
-  --ion-tab-bar-color: #8a85a0;
-  --ion-tab-bar-color-selected: #9b83ff;
-  --ion-item-background: #17151f;
-  --ion-card-background: #17151f;
-  --ion-overlay-background-color: #201d2b;
+    --separator: #262626;
+    --separator-strong: #363636;
 
-  --ion-color-primary: #7c5cfc;
-  --ion-color-primary-rgb: 124, 92, 252;
-  --ion-color-primary-contrast: #ffffff;
-  --ion-color-primary-contrast-rgb: 255, 255, 255;
-  --ion-color-primary-shade: #6d51de;
-  --ion-color-primary-tint: #896bfc;
+    --accent: #0095f6;
+    --accent-press: #1aa0f7;
+    --like: #ed4956;
 
-  --ion-color-danger: #ff4d6d;
-  --ion-color-danger-rgb: 255, 77, 109;
-  --ion-color-danger-contrast: #ffffff;
-  --ion-color-danger-contrast-rgb: 255, 255, 255;
-  --ion-color-danger-shade: #e04460;
-  --ion-color-danger-tint: #ff5f7c;
+    --nav-bg: rgba(0, 0, 0, 0.8);
+    --tabbar-bg: rgba(0, 0, 0, 0.92);
+    --overlay-strong: rgba(0, 0, 0, 0.6);
 
-  --ion-color-success: #2dd4a7;
-  --ion-color-success-rgb: 45, 212, 167;
-  --ion-color-success-contrast: #04130d;
-  --ion-color-success-contrast-rgb: 4, 19, 13;
-  --ion-color-success-shade: #28bb93;
-  --ion-color-success-tint: #42d8b0;
+    --ion-background-color: #000000;
+    --ion-background-color-rgb: 0, 0, 0;
+    --ion-text-color: #ffffff;
+    --ion-text-color-rgb: 255, 255, 255;
 
-  --ion-color-warning: #ffb020;
-  --ion-color-warning-rgb: 255, 176, 32;
-  --ion-color-warning-contrast: #1a1200;
+    --ion-item-background: #121212;
+    --ion-card-background: #121212;
+    --ion-overlay-background-color: #1c1c1e;
 
-  --ion-color-medium: #b0abc4;
-  --ion-color-medium-rgb: 176, 171, 196;
-  --ion-color-medium-contrast: #0e0d14;
+    --ion-color-medium: #a8a8a8;
+    --ion-color-medium-rgb: 168, 168, 168;
 
-  /* rampe sombre (bordures, textes secondaires) */
-  --ion-color-step-50: #1a1922;
-  --ion-color-step-100: #232130;
-  --ion-color-step-150: #2c2a3b;
-  --ion-color-step-200: #353345;
-  --ion-color-step-250: #3e3b50;
-  --ion-color-step-300: #47445a;
-  --ion-color-step-350: #514d66;
-  --ion-color-step-400: #5a5670;
-  --ion-color-step-450: #635f7b;
-  --ion-color-step-500: #6d6886;
-  --ion-color-step-550: #767191;
-  --ion-color-step-600: #807b9c;
-  --ion-color-step-650: #8984a7;
-  --ion-color-step-700: #948fb2;
-  --ion-color-step-750: #9d98bd;
-  --ion-color-step-800: #a7a2c8;
-  --ion-color-step-850: #b1add3;
-  --ion-color-step-900: #bbb6de;
-  --ion-color-step-950: #c5c0e9;
+    /* rampe sombre Ionic */
+    --ion-color-step-50: #0d0d0d;
+    --ion-color-step-100: #1a1a1a;
+    --ion-color-step-150: #262626;
+    --ion-color-step-200: #333333;
+    --ion-color-step-250: #404040;
+    --ion-color-step-300: #4d4d4d;
+    --ion-color-step-350: #595959;
+    --ion-color-step-400: #666666;
+    --ion-color-step-450: #737373;
+    --ion-color-step-500: #808080;
+    --ion-color-step-550: #8c8c8c;
+    --ion-color-step-600: #999999;
+    --ion-color-step-650: #a6a6a6;
+    --ion-color-step-700: #b3b3b3;
+    --ion-color-step-750: #bfbfbf;
+    --ion-color-step-800: #cccccc;
+    --ion-color-step-850: #d9d9d9;
+    --ion-color-step-900: #e6e6e6;
+    --ion-color-step-950: #f2f2f2;
+  }
 }
 
 /* ----------------------------------------------------------------------------
@@ -140,9 +166,8 @@
 body {
   background: var(--bg);
   color: var(--ink);
-  font-family: var(--ion-font-family);
+  font-family: var(--font);
   -webkit-font-smoothing: antialiased;
-  text-rendering: optimizelegibility;
 }
 
 ion-content {
@@ -150,110 +175,112 @@ ion-content {
 }
 
 /* ----------------------------------------------------------------------------
- * 4. En-têtes — toolbars fines, translucides, sans barre pleine
+ * 4. Barres de navigation — fines, translucides, hairline (iOS)
  * ------------------------------------------------------------------------- */
-ion-header {
-  &::after {
-    display: none; /* retire l'ombre de séparation par défaut */
-  }
-}
-
 ion-toolbar {
-  --background: rgba(14, 13, 20, 0.72);
+  --background: var(--nav-bg);
   --color: var(--ink);
   --border-width: 0;
   --border-color: transparent;
-  --min-height: 56px;
-  --padding-start: 16px;
-  --padding-end: 16px;
-  backdrop-filter: saturate(150%) blur(18px);
-  -webkit-backdrop-filter: saturate(150%) blur(18px);
-  box-shadow: 0 1px 0 0 var(--border);
+  --min-height: 48px;
+  --padding-start: 14px;
+  --padding-end: 14px;
+  backdrop-filter: var(--blur);
+  -webkit-backdrop-filter: var(--blur);
 
   ion-title {
-    font-weight: 700;
-    font-size: 1.15rem;
+    font-weight: 600;
+    font-size: 1.0625rem; /* 17px iOS */
     letter-spacing: -0.01em;
+  }
+
+  ion-title.title-large {
+    font-weight: 800;
+    letter-spacing: -0.03em;
+  }
+
+  /* boutons de barre : monochromes, pas de fond */
+  ion-buttons ion-button {
+    --color: var(--ink);
+    --background: transparent;
+    --background-activated: transparent;
+    --box-shadow: none;
+
+    ion-icon {
+      font-size: 25px;
+    }
   }
 }
 
-/* Wordmark de marque (galerie) */
+/* hairline sous les barres compactes (pas sous le grand titre) */
+ion-header:not(.header-collapse-condense) ion-toolbar:last-of-type {
+  box-shadow: 0 0.5px 0 0 var(--separator);
+}
+
+/* Wordmark de marque */
 .brand {
   display: inline-flex;
   align-items: center;
-  gap: 9px;
+  gap: 8px;
   font-weight: 800;
-  font-size: 1.35rem;
-  letter-spacing: -0.02em;
+  font-size: 1.55rem;
+  letter-spacing: -0.03em;
   color: var(--ink);
 
-  .brand-pin {
+  .brand-logo {
     display: grid;
     place-items: center;
-    width: 30px;
-    height: 30px;
-    border-radius: 10px;
-    background: var(--grad);
-    box-shadow: var(--shadow-glow);
+    width: 28px;
+    height: 28px;
+    border-radius: 9px;
+    background: var(--ig-grad);
 
     ion-icon {
-      font-size: 17px;
+      font-size: 16px;
       color: #fff;
     }
   }
 }
 
-.toolbar-sub {
-  font-size: 0.92rem;
-  font-weight: 600;
-  color: var(--muted);
-  letter-spacing: -0.01em;
-}
-
 /* ----------------------------------------------------------------------------
- * 5. Barre d'onglets
+ * 5. Barre d'onglets — monochrome, actif plein (Instagram / iOS)
  * ------------------------------------------------------------------------- */
 ion-tab-bar {
-  --background: #14131c;
+  --background: var(--tabbar-bg);
   --border: 0;
-  border-top: 1px solid var(--border);
-  padding-top: 5px;
-  padding-bottom: max(5px, env(safe-area-inset-bottom));
-  height: calc(60px + env(safe-area-inset-bottom));
+  border-top: 0.5px solid var(--separator);
+  backdrop-filter: var(--blur);
+  -webkit-backdrop-filter: var(--blur);
+  padding-top: 6px;
+  padding-bottom: max(4px, env(safe-area-inset-bottom));
+  height: calc(54px + env(safe-area-inset-bottom));
 }
 
 ion-tab-button {
-  --color: #8a85a0;
-  --color-selected: var(--accent-bright);
-  position: relative;
-  font-weight: 600;
+  --color: var(--tertiary);
+  --color-selected: var(--ink);
 
   ion-icon {
-    font-size: 24px;
-    transition: transform 0.25s var(--ease);
+    font-size: 26px;
   }
 
   ion-label {
-    font-size: 11px;
+    font-size: 10px;
+    font-weight: 600;
     letter-spacing: 0.01em;
-    margin-top: 3px;
+    margin-top: 2px;
   }
 
+  /* l'icône pleine n'apparaît qu'à l'état actif */
+  .icon-filled {
+    display: none;
+  }
   &.tab-selected {
-    ion-icon {
-      transform: translateY(-1px) scale(1.1);
+    .icon-filled {
+      display: block;
     }
-
-    &::before {
-      content: '';
-      position: absolute;
-      top: 5px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 26px;
-      height: 3px;
-      border-radius: 3px;
-      background: var(--grad);
+    .icon-outline {
+      display: none;
     }
   }
 }
@@ -264,113 +291,63 @@ ion-tab-button {
 ion-button {
   --border-radius: var(--radius);
   --box-shadow: none;
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: -0.01em;
   text-transform: none;
-  transition: transform 0.12s var(--ease);
+  transition: opacity 0.12s var(--ease);
 
   &:active {
-    transform: scale(0.96);
+    opacity: 0.6;
   }
 }
 
-/* Primaire = dégradé signature */
+/* Primaire = bleu Instagram plein */
 ion-button[fill='solid'],
-ion-button:not([fill]):not(.action) {
-  --background: var(--grad);
-  --background-activated: var(--grad-active);
-  --background-focused: var(--grad-active);
-  --background-hover: var(--grad-hover);
+ion-button.btn-primary {
+  --background: var(--accent);
+  --background-activated: var(--accent-press);
+  --background-hover: var(--accent-press);
   --color: #ffffff;
-  --box-shadow: 0 8px 20px -10px rgba(124, 92, 252, 0.8);
 }
 
-/* Variante sombre (ex. Google Pay) */
+/* Secondaire = surface neutre */
 ion-button[color='dark'] {
-  --background: var(--surface-2);
-  --background-activated: #2a2738;
-  --background-hover: #2a2738;
+  --background: var(--bg-grouped);
+  --background-activated: var(--separator);
   --color: var(--ink);
-  --box-shadow: inset 0 0 0 1px var(--border);
-}
-
-/* Boutons icône posés sur les photos */
-ion-button.action {
-  --background: rgba(12, 11, 18, 0.5);
-  --background-activated: rgba(12, 11, 18, 0.7);
-  --color: #fff;
-  --border-radius: 50%;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  --box-shadow: inset 0 0 0 0.5px var(--separator-strong);
 }
 
 /* ----------------------------------------------------------------------------
- * 7. FAB de capture
- * ------------------------------------------------------------------------- */
-ion-fab-button {
-  --background: var(--grad);
-  --background-activated: var(--grad-active);
-  --background-hover: var(--grad-hover);
-  --color: #ffffff;
-  --box-shadow: 0 14px 34px -10px rgba(124, 92, 252, 0.7);
-  --border-radius: 22px;
-  width: 64px;
-  height: 64px;
-
-  ion-icon {
-    font-size: 27px;
-  }
-
-  &.is-capturing {
-    animation: fab-pulse 1s var(--ease) infinite;
-  }
-}
-
-@keyframes fab-pulse {
-  0%,
-  100% {
-    box-shadow: 0 14px 34px -10px rgba(124, 92, 252, 0.7);
-  }
-  50% {
-    box-shadow:
-      0 14px 34px -10px rgba(124, 92, 252, 0.7),
-      0 0 0 12px rgba(124, 92, 252, 0.16);
-  }
-}
-
-/* ----------------------------------------------------------------------------
- * 8. Overlays — alertes, toasts, loaders, modales
+ * 7. Overlays — alertes, toasts, loaders, modales (style iOS)
  * ------------------------------------------------------------------------- */
 .alert-wrapper {
   border-radius: var(--radius-lg) !important;
-  background: var(--surface-2) !important;
-  border: 1px solid var(--border);
-  box-shadow: 0 24px 60px -20px rgba(0, 0, 0, 0.8) !important;
+  background: var(--ion-overlay-background-color) !important;
 }
 .alert-title {
   color: var(--ink) !important;
   font-weight: 700 !important;
 }
 .alert-message {
-  color: var(--muted) !important;
+  color: var(--secondary) !important;
 }
 .alert-button {
-  color: var(--accent-bright) !important;
-  font-weight: 700 !important;
+  color: var(--accent) !important;
+  font-weight: 600 !important;
   text-transform: none !important;
 }
 
 ion-toast {
   --border-radius: var(--radius);
-  --background: var(--surface-2);
+  --background: var(--ion-overlay-background-color);
   --color: var(--ink);
-  --box-shadow: 0 16px 40px -16px rgba(0, 0, 0, 0.8);
   font-weight: 600;
 }
 
 ion-loading {
-  --background: var(--surface-2);
-  --spinner-color: var(--accent-bright);
+  --background: var(--ion-overlay-background-color);
+  --spinner-color: var(--ink);
   color: var(--ink);
 }
 
@@ -379,19 +356,17 @@ ion-modal {
 }
 
 /* ----------------------------------------------------------------------------
- * 9. Marqueurs carte (créés en JS hors d'Angular → styles globaux)
+ * 8. Marqueurs carte (créés en JS hors d'Angular → styles globaux)
  * ------------------------------------------------------------------------- */
 .photo-pin {
-  width: 54px;
-  height: 54px;
-  border-radius: 16px;
-  border: 2.5px solid #fff;
-  box-shadow:
-    0 6px 16px -4px rgba(0, 0, 0, 0.6),
-    0 0 0 4px rgba(124, 92, 252, 0.35);
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  border: 3px solid #fff;
+  box-shadow: 0 2px 10px -2px rgba(0, 0, 0, 0.5);
   background-size: cover;
   background-position: center;
-  background-color: var(--surface-2);
+  background-color: #efefef;
   cursor: pointer;
   transition: transform 0.2s var(--ease);
 }
@@ -401,49 +376,48 @@ ion-modal {
 
 .cluster-pin {
   position: relative;
-  width: 58px;
-  height: 58px;
+  width: 52px;
+  height: 52px;
 }
 
 .cluster-badge {
   position: absolute;
-  top: -7px;
-  right: -7px;
-  min-width: 24px;
-  height: 24px;
+  top: -6px;
+  right: -6px;
+  min-width: 22px;
+  height: 22px;
   padding: 0 6px;
-  border-radius: 12px;
-  background: var(--grad);
+  border-radius: 11px;
+  background: var(--like);
   color: #fff;
-  font-family: var(--ion-font-family);
+  font-family: var(--font);
   font-size: 12px;
-  font-weight: 800;
-  line-height: 24px;
+  font-weight: 700;
+  line-height: 22px;
   text-align: center;
   border: 2px solid #fff;
-  box-shadow: var(--shadow-glow);
 }
 
 .spider-pin {
-  width: 46px;
-  height: 46px;
+  width: 44px;
+  height: 44px;
   transition: transform 0.2s var(--ease);
 }
 
 /* ----------------------------------------------------------------------------
- * 10. Scrollbars discrètes (webkit)
+ * 9. Scrollbars discrètes (webkit)
  * ------------------------------------------------------------------------- */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--border-strong);
-  border-radius: 8px;
+  background: var(--separator-strong);
+  border-radius: 7px;
 }
 
 /* ----------------------------------------------------------------------------
- * 11. Accessibilité — mouvement réduit
+ * 10. Accessibilité — mouvement réduit
  * ------------------------------------------------------------------------- */
 @media (prefers-reduced-motion: reduce) {
   *,

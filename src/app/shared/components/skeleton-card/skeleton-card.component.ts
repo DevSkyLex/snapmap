@@ -24,12 +24,11 @@ import { Component } from '@angular/core';
 
       .skeleton {
         aspect-ratio: 1;
-        border-radius: var(--radius-lg, 16px);
         background: linear-gradient(
           100deg,
-          var(--surface, #17151f) 30%,
-          var(--surface-2, #201d2b) 50%,
-          var(--surface, #17151f) 70%
+          var(--bg-grouped, #fafafa) 30%,
+          var(--separator, #dbdbdb) 50%,
+          var(--bg-grouped, #fafafa) 70%
         );
         background-size: 200% 100%;
         animation: skeleton-shimmer 1.3s ease infinite;

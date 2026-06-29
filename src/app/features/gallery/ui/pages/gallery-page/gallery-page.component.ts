@@ -1,24 +1,15 @@
 import { Component, inject, type OnInit } from '@angular/core';
 import {
   IonButton,
+  IonButtons,
   IonContent,
-  IonFab,
-  IonFabButton,
   IonHeader,
   IonIcon,
   IonToolbar,
   ModalController,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import {
-  arrowDown,
-  camera,
-  heart,
-  heartOutline,
-  imagesOutline,
-  location,
-  trash,
-} from 'ionicons/icons';
+import { camera, cameraOutline, heart, imagesOutline, location } from 'ionicons/icons';
 import { FeedbackService } from '@core/feedback';
 import { PermissionsService } from '@core/permissions';
 import { PHOTO_LIBRARY, PhotoDetailComponent } from '@features/photos';
@@ -30,11 +21,12 @@ import { SkeletonCardComponent } from '@shared/components';
  * @class GalleryPageComponent
  *
  * @description
- * Gallery tab page: photo capture, grid, like (challenge 1), confirmed deletion
- * (challenge 1), skeleton card (challenge 4) and opening of the detail view
- * (challenge 2). Orchestrates through the {@link PHOTO_LIBRARY} port.
+ * Gallery tab page: photo capture and an Instagram-style square grid (challenge 4
+ * skeleton while capturing). Tapping a photo opens the full-screen detail view
+ * (challenge 2), where like (challenge 1) and confirmed deletion (challenge 1)
+ * live. Orchestrates through the {@link PHOTO_LIBRARY} port.
  *
- * @version 1.0.0
+ * @version 2.0.0
  *
  * @author Valentin FORTIN <contact@valentin-fortin.pro>
  */
@@ -45,9 +37,8 @@ import { SkeletonCardComponent } from '@shared/components';
   imports: [
     IonHeader,
     IonToolbar,
+    IonButtons,
     IonContent,
-    IonFab,
-    IonFabButton,
     IonIcon,
     IonButton,
     SkeletonCardComponent,
@@ -124,7 +115,7 @@ export class GalleryPageComponent implements OnInit {
    * @since 1.0.0
    */
   public constructor() {
-    addIcons({ arrowDown, camera, heart, heartOutline, imagesOutline, location, trash });
+    addIcons({ camera, cameraOutline, heart, imagesOutline, location });
   }
   //#endregion
 
@@ -174,54 +165,6 @@ export class GalleryPageComponent implements OnInit {
       if (photo) await this.feedback.toast('Photo ajoutée 📸', 'success');
     } catch {
       // Capture cancelled by the user: nothing to do.
-    }
-  }
-
-  /**
-   * Method toggleLike
-   * @method toggleLike
-   *
-   * @description
-   * Toggles the liked state of a photo (without opening the detail view).
-   *
-   * @access public
-   * @since 1.0.0
-   *
-   * @param {UserPhoto} photo - The photo to toggle.
-   * @param {Event} event - The originating click event.
-   *
-   * @returns {Promise<void>} Resolves once persisted.
-   */
-  public async toggleLike(photo: UserPhoto, event: Event): Promise<void> {
-    event.stopPropagation();
-    await this.library.toggleLike(photo);
-  }
-
-  /**
-   * Method confirmDelete
-   * @method confirmDelete
-   *
-   * @description
-   * Asks for confirmation, then deletes the photo (challenge 1).
-   *
-   * @access public
-   * @since 1.0.0
-   *
-   * @param {UserPhoto} photo - The photo to delete.
-   * @param {Event} event - The originating click event.
-   *
-   * @returns {Promise<void>} Resolves once the deletion flow completes.
-   */
-  public async confirmDelete(photo: UserPhoto, event: Event): Promise<void> {
-    event.stopPropagation();
-    const confirmed: boolean = await this.feedback.confirm(
-      'Supprimer la photo ?',
-      'Cette action est définitive.',
-      'Supprimer',
-    );
-    if (confirmed) {
-      await this.library.deletePhoto(photo);
-      await this.feedback.toast('Photo supprimée', 'medium');
     }
   }
 

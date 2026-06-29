@@ -17,11 +17,13 @@ import {
   IonFooter,
   IonHeader,
   IonIcon,
+  IonTitle,
   IonToolbar,
   ModalController,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { calendar, close, heart, heartOutline, location } from 'ionicons/icons';
+import { close, heart, heartOutline, location, trash } from 'ionicons/icons';
+import { FeedbackService } from '@core/feedback';
 import { GeocodingService } from '@core/geocoding';
 import type { UserPhoto } from '@features/photos/models';
 import { PHOTO_LIBRARY } from '@features/photos/ports/photo-library';
@@ -44,7 +46,17 @@ import type { PhotoLibrary } from '@features/photos/ports/photo-library';
   selector: 'app-photo-detail',
   templateUrl: 'photo-detail.component.html',
   styleUrls: ['photo-detail.component.scss'],
-  imports: [IonHeader, IonToolbar, IonButtons, IonButton, IonContent, IonIcon, IonFooter, DatePipe],
+  imports: [
+    IonHeader,
+    IonToolbar,
+    IonTitle,
+    IonButtons,
+    IonButton,
+    IonContent,
+    IonIcon,
+    IonFooter,
+    DatePipe,
+  ],
 })
 export class PhotoDetailComponent implements OnInit {
   //#region Inputs
@@ -160,6 +172,20 @@ export class PhotoDetailComponent implements OnInit {
    * @type {ChangeDetectorRef}
    */
   private readonly changeDetector: ChangeDetectorRef = inject<ChangeDetectorRef>(ChangeDetectorRef);
+
+  /**
+   * Property feedback
+   * @readonly
+   *
+   * @description
+   * User feedback service (deletion confirmation dialog).
+   *
+   * @access private
+   * @since 2.0.0
+   *
+   * @type {FeedbackService}
+   */
+  private readonly feedback: FeedbackService = inject<FeedbackService>(FeedbackService);
   //#endregion
 
   //#region Constructor
@@ -174,7 +200,7 @@ export class PhotoDetailComponent implements OnInit {
    * @since 1.0.0
    */
   public constructor() {
-    addIcons({ close, heart, heartOutline, location, calendar });
+    addIcons({ close, heart, heartOutline, location, trash });
   }
   //#endregion
 
@@ -252,6 +278,32 @@ export class PhotoDetailComponent implements OnInit {
    */
   public toggleLike(): void {
     void this.library.toggleLike(this.photo);
+  }
+
+  /**
+   * Method deletePhoto
+   * @method deletePhoto
+   *
+   * @description
+   * Asks for confirmation, deletes the current photo (challenge 1) and closes the
+   * viewer. The gallery grid updates reactively through the shared signal.
+   *
+   * @access public
+   * @since 2.0.0
+   *
+   * @returns {Promise<void>} Resolves once the deletion flow completes.
+   */
+  public async deletePhoto(): Promise<void> {
+    const confirmed: boolean = await this.feedback.confirm(
+      'Supprimer la photo ?',
+      'Cette action est définitive.',
+      'Supprimer',
+    );
+    if (!confirmed) return;
+
+    await this.library.deletePhoto(this.photo);
+    await this.feedback.toast('Photo supprimée', 'medium');
+    await this.modalController.dismiss();
   }
 
   /**

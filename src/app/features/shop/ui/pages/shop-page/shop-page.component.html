@@ -4,39 +4,40 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <div class="photo-grid">
-    @for (photo of library.photos(); track photo.id) {
-      <div class="photo-card" [class.locked]="!photo.purchased">
-        <img [src]="photo.webviewPath" alt="Photo" loading="lazy" />
+<ion-content>
+  @if (library.photos().length) {
+    <div class="photo-grid">
+      @for (photo of library.photos(); track photo.id) {
+        <div class="card" [class.locked]="!photo.purchased">
+          <img [src]="photo.webviewPath" alt="Photo" loading="lazy" />
 
-        @if (!photo.purchased) {
-          <div class="lock-overlay">
-            <span class="lock-badge"><ion-icon name="lock-closed"></ion-icon></span>
-            <span class="price">5 €</span>
-            <div class="buy-actions">
-              <ion-button size="small" (click)="buyPhoto(photo.id)">
-                <ion-icon slot="start" name="card-outline"></ion-icon>
-                Carte
-              </ion-button>
-              <ion-button size="small" color="dark" (click)="buyPhotoWithGooglePay(photo.id)">
-                Google&nbsp;Pay
-              </ion-button>
+          @if (!photo.purchased) {
+            <div class="lock-overlay">
+              <ion-icon class="lock" name="lock-closed"></ion-icon>
+              <span class="price">5 €</span>
+              <div class="buy">
+                <ion-button class="btn-primary" size="small" (click)="buyPhoto(photo.id)">
+                  <ion-icon slot="start" name="card-outline"></ion-icon>
+                  Carte
+                </ion-button>
+                <ion-button size="small" color="dark" (click)="buyPhotoWithGooglePay(photo.id)">
+                  Google&nbsp;Pay
+                </ion-button>
+              </div>
             </div>
-          </div>
-        } @else {
-          <span class="unlocked-badge"><ion-icon name="lock-open"></ion-icon></span>
-        }
-      </div>
-    } @empty {
-      <div class="empty">
-        <span class="empty-icon"><ion-icon name="bag-handle-outline"></ion-icon></span>
-        <h2>Votre boutique est vide</h2>
-        <p>
-          Prenez d'abord des photos dans la galerie : vous pourrez les débloquer et les revendre
-          ici.
-        </p>
-      </div>
-    }
-  </div>
+          } @else {
+            <span class="unlocked"><ion-icon name="lock-open"></ion-icon></span>
+          }
+        </div>
+      }
+    </div>
+  } @else {
+    <div class="empty">
+      <span class="empty-icon"><ion-icon name="bag-handle-outline"></ion-icon></span>
+      <h2>Votre boutique est vide</h2>
+      <p>
+        Prenez d'abord des photos dans la galerie : vous pourrez les débloquer et les revendre ici.
+      </p>
+    </div>
+  }
 </ion-content>
