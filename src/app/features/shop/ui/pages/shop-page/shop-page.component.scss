@@ -1,112 +1,374 @@
-.photo-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
+/* En-tête : titre + sous-titre, pastille « achetées » */
+.head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
   gap: 12px;
-  padding: 12px 12px calc(20px + env(safe-area-inset-bottom));
 }
 
-.card {
+.bought-pill {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 8px 13px;
+  border-radius: 999px;
+  background: var(--surface);
+  border: 0.5px solid var(--separator-strong);
+  color: var(--ink);
+  font-size: 0.8rem;
+  font-weight: 700;
+
+  ion-icon {
+    font-size: 15px;
+    color: var(--accent);
+  }
+}
+
+/* Bannière d'offre « tout débloquer ce lieu » */
+.bundle {
   position: relative;
-  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  width: calc(100% - 32px);
+  margin: 16px 16px 0;
+  padding: 16px 18px;
+  border: 0;
+  border-radius: 22px;
   overflow: hidden;
-  aspect-ratio: 1;
-  background: var(--bg-grouped);
-  box-shadow: inset 0 0 0 0.5px var(--separator);
+  background: linear-gradient(135deg, #0e1726, #16233a);
+  box-shadow: var(--shadow-card);
+  text-align: left;
+  cursor: pointer;
+  transition: transform 0.12s var(--ease);
 
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: filter 0.3s var(--ease);
+  &:active {
+    transform: scale(0.99);
   }
 
-  &.locked img {
-    filter: blur(20px) brightness(0.85);
-    transform: scale(1.15);
-  }
-
-  .lock-overlay {
+  .glow {
     position: absolute;
-    inset: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 10px;
-    background: var(--overlay-strong);
+    right: -30px;
+    top: -30px;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(0, 194, 168, 0.45), transparent 70%);
+  }
 
-    .lock {
+  .bundle-copy {
+    position: relative;
+    min-width: 0;
+  }
+
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 9px;
+    border-radius: 999px;
+    background: rgba(0, 194, 168, 0.22);
+    color: #4fe3ce;
+    font-size: 0.66rem;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+
+    ion-icon {
+      font-size: 11px;
+    }
+  }
+
+  .bundle-title {
+    display: block;
+    margin-top: 9px;
+    color: #fff;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.0625rem;
+    line-height: 1.2;
+  }
+
+  .bundle-price {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-top: 7px;
+    white-space: nowrap;
+
+    strong {
+      color: #fff;
+      font-weight: 800;
+      font-size: 1.2rem;
+    }
+
+    s {
+      color: rgba(255, 255, 255, 0.5);
+      font-size: 0.82rem;
+      font-weight: 600;
+    }
+
+    em {
+      color: #4fe3ce;
+      font-style: normal;
+      font-size: 0.76rem;
+      font-weight: 700;
+    }
+  }
+
+  .bundle-go {
+    position: relative;
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 15px;
+    background: var(--accent);
+    box-shadow: 0 8px 18px -6px rgba(0, 194, 168, 0.7);
+
+    ion-icon {
       font-size: 22px;
       color: #fff;
     }
-
-    .price {
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: #fff;
-    }
-
-    .buy {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      width: 100%;
-      max-width: 152px;
-
-      ion-button {
-        margin: 0;
-        height: 34px;
-        font-size: 0.78rem;
-      }
-    }
-  }
-
-  .unlocked {
-    position: absolute;
-    top: 8px;
-    right: 8px;
-    display: grid;
-    place-items: center;
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.92);
-
-    ion-icon {
-      font-size: 15px;
-      color: #000;
-    }
   }
 }
 
+/* Filtres */
+.chips {
+  display: flex;
+  gap: 8px;
+  padding: 16px 16px 6px;
+}
+
+.chip {
+  height: 34px;
+  padding: 0 15px;
+  border: 0.5px solid var(--separator-strong);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--secondary);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  transition:
+    background-color 0.15s var(--ease),
+    color 0.15s var(--ease);
+
+  &.active {
+    border-color: transparent;
+    background: var(--ink);
+    color: var(--surface);
+  }
+}
+
+/* Grille portrait 2 colonnes */
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  padding: 10px 16px calc(90px + env(safe-area-inset-bottom));
+}
+
+.tile {
+  position: relative;
+  display: block;
+  aspect-ratio: 0.82;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 20px;
+  overflow: hidden;
+  background: var(--grouped);
+  box-shadow: var(--shadow-card);
+  cursor: pointer;
+  transition: transform 0.12s var(--ease);
+
+  &:active {
+    transform: scale(0.98);
+  }
+
+  .shot {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+
+    &.blur {
+      filter: blur(13px) brightness(0.92);
+      transform: scale(1.18);
+    }
+  }
+
+  .scrim {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: rgba(14, 23, 38, 0.34);
+  }
+
+  &:focus-visible {
+    outline: 3px solid var(--accent);
+    outline-offset: -3px;
+  }
+}
+
+/* Pastille cadenas */
+.lock-chip {
+  position: absolute;
+  z-index: 2;
+  top: 10px;
+  left: 10px;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.16);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+
+  ion-icon {
+    font-size: 15px;
+    color: #fff;
+  }
+}
+
+/* Badge « Débloquée » */
+.badge {
+  position: absolute;
+  z-index: 2;
+  top: 10px;
+  right: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: var(--accent-strong);
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+
+  ion-icon {
+    font-size: 12px;
+  }
+}
+
+.unlocked {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+/* Pied de tuile */
+.foot {
+  position: absolute;
+  z-index: 2;
+  left: 10px;
+  right: 10px;
+  bottom: 10px;
+
+  &.single {
+    display: flex;
+  }
+}
+
+.loc {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  overflow: hidden;
+  margin-bottom: 6px;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  ion-icon {
+    flex: none;
+    font-size: 11px;
+  }
+}
+
+.price-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 38px;
+  border-radius: 12px;
+  background: var(--accent-strong);
+  color: #fff;
+  font-size: 0.82rem;
+  font-weight: 700;
+
+  ion-icon {
+    font-size: 14px;
+  }
+}
+
+.hd-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 38px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.92);
+  color: #0e1726;
+  font-size: 0.82rem;
+  font-weight: 700;
+
+  ion-icon {
+    font-size: 15px;
+  }
+}
+
+.filter-empty {
+  grid-column: 1 / -1;
+  margin: 18px 0;
+  text-align: center;
+  color: var(--secondary);
+  font-size: 0.92rem;
+}
+
+/* État vide */
 .empty {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 12px;
-  padding: 16% 32px 0;
+  padding: 22% 32px 0;
   text-align: center;
 
   .empty-icon {
     display: grid;
     place-items: center;
-    width: 84px;
-    height: 84px;
+    width: 88px;
+    height: 88px;
     margin-bottom: 4px;
     border-radius: 26px;
-    background: var(--ig-grad);
+    background: var(--accent-grad);
+    box-shadow: 0 18px 34px -14px rgba(0, 162, 196, 0.7);
 
     ion-icon {
-      font-size: 38px;
+      font-size: 40px;
       color: #fff;
     }
   }
 
   h2 {
     margin: 0;
+    font-family: var(--font-display);
     font-size: 1.4rem;
-    font-weight: 800;
+    font-weight: 700;
     letter-spacing: -0.02em;
     color: var(--ink);
     text-wrap: balance;

@@ -129,6 +129,7 @@ export class FeedbackService {
    * @param {string} header - The dialog header.
    * @param {string} message - The dialog message.
    * @param {string} [confirmText] - The confirm button label (defaults to `'Confirmer'`).
+   * @param {boolean} [danger] - When `true`, styles the confirm action as destructive (red).
    *
    * @returns {Promise<boolean>} `true` when the user confirms.
    */
@@ -136,10 +137,12 @@ export class FeedbackService {
     header: string,
     message: string,
     confirmText = 'Confirmer',
+    danger = false,
   ): Promise<boolean> {
     const alert: HTMLIonAlertElement = await this.alertController.create({
       header,
       message,
+      cssClass: danger ? 'alert-danger' : undefined,
       buttons: [
         { text: 'Annuler', role: 'cancel' },
         { text: confirmText, role: 'confirm' },

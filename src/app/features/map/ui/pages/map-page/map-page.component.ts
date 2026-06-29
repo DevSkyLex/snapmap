@@ -6,21 +6,29 @@ import {
   signal,
   type WritableSignal,
 } from '@angular/core';
-import {
-  IonContent,
-  IonHeader,
-  IonTitle,
-  IonToolbar,
-  ModalController,
-} from '@ionic/angular/standalone';
+import { IonContent, IonIcon, ModalController } from '@ionic/angular/standalone';
+import { addIcons } from 'ionicons';
+import { locate, search } from 'ionicons/icons';
 import { FeedbackService } from '@core/feedback';
+import { GeocodingService } from '@core/geocoding';
 import { GeolocationService } from '@core/geolocation';
 import type { Coordinates } from '@core/geolocation';
 import { PermissionsService } from '@core/permissions';
 import { MapService } from '@features/map/services/map/map.service';
-import { ClusterModalComponent } from '@features/map/ui/components';
+import { ClusterModalComponent, LocationPrimingComponent } from '@features/map/ui/components';
 import { PHOTO_LIBRARY, PhotoDetailComponent } from '@features/photos';
 import type { PhotoLibrary, UserPhoto } from '@features/photos';
+
+/**
+ * Variable locationPrimed
+ *
+ * @description
+ * Whether the location priming sheet has already been shown this session (it
+ * only appears once, before the first native prompt).
+ *
+ * @since 4.1.0
+ */
+let locationPrimed = false;
 
 /**
  * Component MapPageComponent
@@ -28,10 +36,12 @@ import type { PhotoLibrary, UserPhoto } from '@features/photos';
  *
  * @description
  * Map tab page: fetches the position (default fallback on refusal — challenge 5),
- * initializes Mapbox and plots photos as pins/clusters (challenge 3). Orchestrates
- * through the {@link PHOTO_LIBRARY} port and the {@link MapService}.
+ * initializes Mapbox and plots photos as circular pins/clusters (challenge 3).
+ * A floating field searches a place (forward geocoding) and a control recenters on
+ * the user. Orchestrates through the {@link PHOTO_LIBRARY} port and the
+ * {@link MapService}.
  *
- * @version 1.0.0
+ * @version 4.0.0
  *
  * @author Valentin FORTIN <contact@valentin-fortin.pro>
  */
@@ -39,7 +49,7 @@ import type { PhotoLibrary, UserPhoto } from '@features/photos';
   selector: 'app-map',
   templateUrl: 'map-page.component.html',
   styleUrls: ['map-page.component.scss'],
-  imports: [IonHeader, IonToolbar, IonTitle, IonContent],
+  imports: [IonContent, IonIcon],
 })
 export class MapPageComponent implements AfterViewInit, OnDestroy {
   //#region Properties
@@ -70,6 +80,20 @@ export class MapPageComponent implements AfterViewInit, OnDestroy {
    * @type {GeolocationService}
    */
   private readonly geolocation: GeolocationService = inject<GeolocationService>(GeolocationService);
+
+  /**
+   * Property geocoding
+   * @readonly
+   *
+   * @description
+   * Geocoding service (forward lookup for the search field).
+   *
+   * @access private
+   * @since 4.0.0
+   *
+   * @type {GeocodingService}
+   */
+  private readonly geocoding: GeocodingService = inject<GeocodingService>(GeocodingService);
 
   /**
    * Property permissions
@@ -132,8 +156,8 @@ export class MapPageComponent implements AfterViewInit, OnDestroy {
    * @readonly
    *
    * @description
-   * Whether the map has finished its initial load (hides the spinner). Exposed
-   * as a signal so the view reacts under zoneless change detection.
+   * Whether the map has finished its initial load (hides the spinner). Exposed as
+   * a signal so the view reacts under zoneless change detection.
    *
    * @access protected
    * @since 1.0.0
@@ -143,6 +167,22 @@ export class MapPageComponent implements AfterViewInit, OnDestroy {
   protected readonly mapLoaded: WritableSignal<boolean> = signal<boolean>(false);
   //#endregion
 
+  //#region Constructor
+  /**
+   * Constructor
+   * @constructor
+   *
+   * @description
+   * Registers the icons used by the template.
+   *
+   * @access public
+   * @since 2.0.0
+   */
+  public constructor() {
+    addIcons({ locate, search });
+  }
+  //#endregion
+
   //#region Lifecycle
   /**
    * Method ngAfterViewInit
@@ -150,7 +190,7 @@ export class MapPageComponent implements AfterViewInit, OnDestroy {
    *
    * @description
    * Loads photos, resolves the position (with default fallback), initializes the
-   * map and plots the photos.
+   * map, plots the photos and the "my position" marker.
    *
    * @access public
    * @since 1.0.0
@@ -161,8 +201,7 @@ export class MapPageComponent implements AfterViewInit, OnDestroy {
     await this.library.loadSaved();
 
     // Challenge 5: a denied geolocation must NOT block the map → default center.
-    const granted: boolean = await this.permissions.ensureLocation();
-    const coords: Coordinates | null = granted ? await this.geolocation.getCurrentPosition() : null;
+    const coords: Coordinates | null = await this.resolveLocation();
     if (!coords) {
       await this.feedback.toast('Position indisponible : carte centrée par défaut', 'warning');
     }
@@ -173,6 +212,7 @@ export class MapPageComponent implements AfterViewInit, OnDestroy {
     try {
       await this.mapService.initMap('map', coords ? [coords.lng, coords.lat] : null);
       this.mapService.renderPhotos(this.library.photos());
+      if (coords) this.mapService.setUserLocation([coords.lng, coords.lat]);
     } catch {
       await this.feedback.alert(
         'Carte indisponible',
@@ -197,6 +237,50 @@ export class MapPageComponent implements AfterViewInit, OnDestroy {
    */
   public ngOnDestroy(): void {
     this.mapService.destroy();
+  }
+  //#endregion
+
+  //#region Public Methods
+  /**
+   * Method search
+   * @method search
+   *
+   * @description
+   * Forward-geocodes the typed place and flies the map there, or toasts when it
+   * cannot be found.
+   *
+   * @access public
+   * @since 4.0.0
+   *
+   * @param {string} query - The free-text place to search.
+   *
+   * @returns {Promise<void>} Resolves once the lookup settles.
+   */
+  public async search(query: string): Promise<void> {
+    if (!query.trim()) return;
+
+    const center: [number, number] | null = await this.geocoding.forwardGeocode(query);
+    if (center) {
+      this.mapService.focusOn(center, 13);
+    } else {
+      await this.feedback.toast('Lieu introuvable', 'medium');
+    }
+  }
+
+  /**
+   * Method recenter
+   * @method recenter
+   *
+   * @description
+   * Flies the map back to the user's position.
+   *
+   * @access public
+   * @since 4.0.0
+   *
+   * @returns {void} Nothing.
+   */
+  public recenter(): void {
+    this.mapService.recenter();
   }
   //#endregion
 
@@ -228,6 +312,56 @@ export class MapPageComponent implements AfterViewInit, OnDestroy {
   }
 
   /**
+   * Method resolveLocation
+   * @method resolveLocation
+   *
+   * @description
+   * Resolves the user position, showing the priming sheet once per session before
+   * the first native prompt. "Plus tard" skips geolocation (default center).
+   *
+   * @access private
+   * @since 4.1.0
+   *
+   * @returns {Promise<Coordinates | null>} The position, or `null` for the default center.
+   */
+  private async resolveLocation(): Promise<Coordinates | null> {
+    if (!locationPrimed) {
+      locationPrimed = true;
+      const allow: boolean = await this.showLocationPriming();
+      if (!allow) return null;
+    }
+
+    const granted: boolean = await this.permissions.ensureLocation();
+    return granted ? await this.geolocation.getCurrentPosition() : null;
+  }
+
+  /**
+   * Method showLocationPriming
+   * @method showLocationPriming
+   *
+   * @description
+   * Presents the location priming sheet and resolves the user's choice.
+   *
+   * @access private
+   * @since 4.1.0
+   *
+   * @returns {Promise<boolean>} `true` when the user accepts the location request.
+   */
+  private async showLocationPriming(): Promise<boolean> {
+    const modal: HTMLIonModalElement = await this.modalController.create({
+      component: LocationPrimingComponent,
+      cssClass: 'sheet-modal',
+      breakpoints: [0, 0.62],
+      initialBreakpoint: 0.62,
+      handle: true,
+    });
+    await modal.present();
+
+    const result = await modal.onDidDismiss<{ allow?: boolean }>();
+    return result.data?.allow ?? false;
+  }
+
+  /**
    * Method openCluster
    * @method openCluster
    *
@@ -245,6 +379,10 @@ export class MapPageComponent implements AfterViewInit, OnDestroy {
     const modal: HTMLIonModalElement = await this.modalController.create({
       component: ClusterModalComponent,
       componentProps: { photos },
+      cssClass: 'sheet-modal',
+      breakpoints: [0, 0.7, 1],
+      initialBreakpoint: 0.7,
+      handle: true,
     });
     await modal.present();
 

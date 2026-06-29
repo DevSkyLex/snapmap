@@ -1,0 +1,11 @@
+<div class="dialog" [class.danger]="danger">
+  <span class="badge"><ion-icon [name]="icon"></ion-icon></span>
+  <h2>{{ title }}</h2>
+  @if (message) {
+    <p>{{ message }}</p>
+  }
+  <div class="actions">
+    <button type="button" class="act confirm" (click)="confirm()">{{ confirmText }}</button>
+    <button type="button" class="act cancel" (click)="cancel()">{{ cancelText }}</button>
+  </div>
+</div>

@@ -1,64 +1,89 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>SnapMap</ion-title>
-  </ion-toolbar>
-</ion-header>
-
 <ion-content [fullscreen]="true">
+  <header class="page-head head">
+    <div class="titles">
+      <span class="greeting">Vos souvenirs géolocalisés</span>
+      <h1>Mes photos</h1>
+    </div>
+    <span class="logo" aria-hidden="true">
+      <ion-icon name="location"></ion-icon>
+    </span>
+  </header>
+
   @if (library.photos().length || library.isCapturing()) {
-    <div class="feed">
+    <div class="chips" role="tablist" aria-label="Filtrer les photos">
+      <button
+        type="button"
+        role="tab"
+        class="chip"
+        [class.active]="filter() === 'all'"
+        [attr.aria-selected]="filter() === 'all'"
+        (click)="setFilter('all')"
+      >
+        Toutes · {{ library.photos().length }}
+      </button>
+      <button
+        type="button"
+        role="tab"
+        class="chip"
+        [class.active]="filter() === 'liked'"
+        [attr.aria-selected]="filter() === 'liked'"
+        (click)="setFilter('liked')"
+      >
+        <ion-icon name="heart"></ion-icon>
+        Aimées · {{ likedCount() }}
+      </button>
+    </div>
+
+    <div class="grid">
       @if (library.isCapturing()) {
-        <section class="post post--loading">
-          <app-skeleton-card></app-skeleton-card>
-        </section>
+        <div class="tile tile--loading" aria-hidden="true"></div>
       }
 
-      @for (photo of library.photos(); track photo.id) {
-        <section class="post" (click)="openDetail(photo)">
-          <img class="post-blur" [src]="photo.webviewPath" alt="" aria-hidden="true" />
-          <img class="post-bg" [src]="photo.webviewPath" alt="Photo" />
-          <span class="scrim scrim--top"></span>
-          <span class="scrim scrim--bottom"></span>
-
-          <header class="post-head">
-            <img class="avatar" [src]="photo.webviewPath" alt="" />
-            <div class="who">
-              <span class="place">{{ photo.locationName || 'Position enregistrée' }}</span>
-              <span class="when">{{ photo.date | date: 'd MMM yyyy à HH:mm' }}</span>
-              @if (photo.purchased) {
-                <span class="badge"><ion-icon name="checkmark-circle"></ion-icon> Acheté</span>
-              }
-            </div>
-          </header>
-
+      @for (photo of visiblePhotos(); track photo.id; let i = $index) {
+        <div class="tile">
+          <img
+            [src]="photo.webviewPath"
+            [alt]="'Photo — ' + (photo.locationName || 'position enregistrée')"
+            [attr.loading]="i < 4 ? null : 'lazy'"
+            decoding="async"
+          />
+          <button
+            type="button"
+            class="tile-open"
+            [attr.aria-label]="
+              'Ouvrir la photo — ' + (photo.locationName || 'position enregistrée')
+            "
+            (click)="openDetail(photo)"
+          ></button>
           <button
             type="button"
             class="like"
             [class.liked]="photo.liked"
-            aria-label="Aimer la photo"
+            [attr.aria-label]="photo.liked ? 'Retirer des aimées' : 'Aimer la photo'"
             (click)="toggleLike(photo, $event)"
           >
             <ion-icon [name]="photo.liked ? 'heart' : 'heart-outline'"></ion-icon>
           </button>
-        </section>
+        </div>
+      } @empty {
+        <p class="filter-empty">Aucune photo aimée pour l'instant.</p>
       }
     </div>
 
     <button
       type="button"
-      class="snap-fab"
+      class="fab"
       [class.busy]="library.isCapturing()"
       aria-label="Prendre une photo"
       (click)="takePhoto()"
     >
       <ion-icon name="camera"></ion-icon>
-      Snap
     </button>
   } @else {
     <div class="empty">
-      <span class="empty-icon"><ion-icon name="images-outline"></ion-icon></span>
-      <h2>Vos souvenirs commencent ici</h2>
-      <p>Prenez une photo : elle apparaîtra dans le feed et sur la carte, géolocalisée.</p>
+      <span class="empty-icon"><ion-icon name="location"></ion-icon></span>
+      <h2>Posez votre premier point</h2>
+      <p>Chaque photo devient un souvenir géolocalisé : épinglé dans la galerie et sur la carte.</p>
       <ion-button class="btn-primary cta" (click)="takePhoto()">
         <ion-icon slot="start" name="camera"></ion-icon>
         Prendre une photo

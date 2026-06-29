@@ -33,16 +33,26 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths"></meta-data>
         </provider>
+
+        <!-- Google Pay natif (@capacitor-community/stripe). Le launcher lit sa
+             configuration ici : environnement TEST, France, et la clé publique
+             (pk_test, exposable côté client). google_pay_existing_payment_method_required
+             à false → Google Pay reste disponible même sans carte déjà enregistrée. -->
+        <meta-data android:name="com.getcapacitor.community.stripe.enable_google_pay" android:value="true" />
+        <meta-data android:name="com.getcapacitor.community.stripe.google_pay_is_testing" android:value="true" />
+        <meta-data android:name="com.getcapacitor.community.stripe.country_code" android:value="FR" />
+        <meta-data android:name="com.getcapacitor.community.stripe.merchant_display_name" android:value="SnapMap" />
+        <meta-data android:name="com.getcapacitor.community.stripe.google_pay_existing_payment_method_required" android:value="false" />
+        <meta-data android:name="com.getcapacitor.community.stripe.publishable_key" android:value="pk_test_51Tnc0dBplPumrnfjV826Lvnp46ZgKMqOETv9IkRb8EOjK8DbE2RKh2fllu93s5rwmlTPwnxZmu5bUZ0J63qmUVhk00ubZ6OKLS" />
     </application>
 
     <!-- Permissions -->
 
     <uses-permission android:name="android.permission.INTERNET" />
-
-    <!-- SnapMap : caméra (selfies) et géolocalisation (carte) -->
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <uses-feature android:name="android.hardware.camera" android:required="false" />
+    <uses-feature android:name="android.hardware.location" android:required="false" />
 </manifest>

@@ -1,62 +1,103 @@
 # Design
 
-Système visuel de **SnapMap** — app mobile Ionic, registre _product_, direction **feed Instagram +
-iOS récent**, thème **adaptatif clair / sombre** (suit le réglage système). Référence : la vidéo de
-démo fournie par l'utilisateur (feed sombre, accent bleu, tab bar flottante).
+Système visuel de **SnapMap** — app mobile Ionic, registre _product_. Direction **« social teal »**
+importée du design Claude (`SnapMap.dc.html`) : **galerie en grille comme accueil**, carte à pins
+photo, boutique à cartes. Thème **adaptatif clair / sombre** (suit le réglage système). Repères :
+Instagram, _Polarsteps_, applis photo iOS modernes.
 
 ## Theme
 
-Épuré, natif, photo-forward. UI quasi **monochrome** (noir/blanc/gris + hairlines) ; la **photo
-porte toute la couleur**. Le **dégradé Instagram** est réservé à un seul moment de marque (icône
-d'état vide). Clair = blanc façon feed Instagram ; sombre = **noir pur** (#000). Bascule automatique
-via `@media (prefers-color-scheme)`. App forcée en **mode Ionic `ios`** sur toutes les plateformes.
+Photo-forward, **clair et frais**. Fond **gris froid** (`#E7E9EE`) d'où se détachent des **cartes
+blanches** ; la photo porte la couleur, l'**accent teal** porte les actions (capture, onglet actif,
+primaires, pins). Le **dégradé teal → cyan** est réservé aux moments de marque (logo, FAB, pastille
+d'état vide). Clair = gris froid / surfaces blanches ; sombre = **bleu nuit** (`#0B0E14`). Bascule
+automatique via `@media (prefers-color-scheme)`. App forcée en **mode Ionic `ios`**.
+
+**Accessibilité du teal** : trois nuances pour rester ≥4.5:1. `--accent` (teal vif `#00C2A8` clair /
+`#19D3B8` sombre) pour pins, onglet actif, icônes, dégradé. `--accent-strong` (`#00796B`) pour les
+**fonds de boutons** à texte blanc (≥4.5:1) — un cran plus profond que le teal vif du mock, pour la
+lisibilité. `--accent-text` (texte/liens accent : `#00796B` clair / `#19D3B8` sombre).
+
+**Discipline du verre** : le `backdrop-filter` est réservé au **chrome** (tab bar, champ de recherche
+carte) et aux **incrustations sur photo** (like, prix, badges, barre du visualiseur) — jamais en
+décoration.
+
+**Boutons plats** : pleins, **sans ombre** (préférence utilisateur conservée, même si le mock en
+montre). L'ombre est réservée à l'**élévation** : cartes, FAB, barres, pins de carte. Les **cartes**
+portent une ombre douce **sans bordure** (jamais bordure + ombre large ensemble).
 
 ## Color palette
 
 Tokens CSS exposés pour les deux thèmes (valeur sombre entre parenthèses).
 
-| Rôle                        | Token          | Clair (Sombre)                                                   |
-| --------------------------- | -------------- | ---------------------------------------------------------------- |
-| Fond app                    | `--bg`         | `#FFFFFF` (`#000000`)                                            |
-| Fond groupé / cellule       | `--bg-grouped` | `#FAFAFA` (`#0A0A0A`)                                            |
-| Texte primaire              | `--ink`        | `#000000` (`#FFFFFF`)                                            |
-| Texte secondaire            | `--secondary`  | `#6B6B6B` (`#A8A8A8`) — ≥4.5:1                                   |
-| Hairline                    | `--separator`  | `#DBDBDB` (`#262626`)                                            |
-| Accent (Snap, onglet actif) | `--accent`     | `#0A84FF` (bleu iOS)                                             |
-| Like / danger               | `--like`       | `#ED4956`                                                        |
-| Acheté (badge)              | `--success`    | `#30D158` (vert iOS)                                             |
-| Dégradé marque (état vide)  | `--ig-grad`    | `linear-gradient(45deg,#feda75,#fa7e1e,#d62976,#962fbf,#4f5bd5)` |
+| Rôle                          | Token             | Clair (Sombre)                              |
+| ----------------------------- | ----------------- | ------------------------------------------- |
+| Fond app (gris froid)         | `--bg`            | `#E7E9EE` (`#0B0E14`)                        |
+| Surface (cartes, barres)      | `--surface`       | `#FFFFFF` (`#151A23`)                        |
+| Puce neutre / champ           | `--grouped`       | `#F1F3F6` (`#1B212C`)                        |
+| Texte primaire                | `--ink`           | `#0E1726` (`#F2F4F8`)                        |
+| Texte secondaire              | `--secondary`     | `#6B7686` (`#9AA3B0`) — ≥4.5:1               |
+| Icônes / gros texte           | `--tertiary`      | `#8A93A2` (`#6B7686`)                        |
+| Hairline                      | `--separator`     | `#E6E9EE` (`rgba(255,255,255,.08)`)          |
+| Accent (pins, onglet actif)   | `--accent`        | `#00C2A8` (`#19D3B8`) — teal vif             |
+| Accent fond bouton (AA)       | `--accent-strong` | `#00796B` — texte blanc ≥4.5:1              |
+| Accent texte/liens            | `--accent-text`   | `#00796B` (`#19D3B8`)                        |
+| Like / danger / 99+           | `--like`          | `#FF4D6D`                                    |
+| Acheté (badge)                | `--success`       | `#00B09A` (`#19D3B8`)                        |
+| Bouton secondaire foncé       | `--ink-btn`       | `#0E1726` (texte clair) — ex. Google Pay     |
+| Dégradé de marque (teal→cyan) | `--accent-grad`   | `linear-gradient(145deg,#00C2A8,#00A2C4)`    |
 
 ## Typography
 
-**Police système** (`-apple-system` → SF Pro sur iOS) — pas de webfont, rendu natif. Titre de barre
-centré 17px/600, lieu de carte 600, date/secondaire en `--secondary`. Échelle rem fixe.
+**Deux voix.** Display **Space Grotesk** (`--font-display`, 500–700) pour les titres d'écran (« Mes
+photos », « Boutique »), les gros chiffres et les titres de feuille ; texte **Plus Jakarta Sans**
+(`--font`, 400–800) pour tout le reste. Chargées via Google Fonts (`index.html`). Couple à fort
+contraste (grotesque géométrique + humaniste), jamais deux sans-serifs jumelles. _(La précédente
+signature « coordonnées GPS monospace » est abandonnée : ce design nomme le lieu + la date.)_
 
 ## Components
 
-- **Galerie = feed plein écran** (façon TikTok/Snapchat) : **un élément = toute la hauteur**
-  (`100dvh`), défilement par à-coups (`scroll-snap-type: y mandatory`). Photo nette `contain` sur un
-  **fond flouté** qui remplit l'écran ; en haut avatar + **lieu** (reverse geocoding) + date + badge
-  vert **« Acheté »** ; **cœur** (like) en bas à droite. Scrims dégradés pour la lisibilité.
-- **Bouton « Snap »** : pilule **bleue flottante** (caméra) centrée au-dessus de la tab bar — la
-  capture vit là.
-- **Barre d'onglets** : **flottante arrondie** translucide (style iOS 26), icônes monochromes
-  **pleines à l'actif** en **bleu** / contour sinon. Galerie / Carte / Boutique.
-- **Barre de nav** : translucide, titre **« SnapMap » centré**, hairline 0.5px.
-- **Visualiseur photo** : plein écran **toujours sombre** ; sous la photo, **lieu** + badge vert
-  « Achetée » + date, et la rangée d'actions **« J'aime » (cœur) + corbeille** (like et suppression
-  vivent ici).
-- **Boutique** : cartes nettes (hairline, rayon 14px), flou de verrouillage, prix + « Carte »
-  (bleu) / « Google Pay » (neutre) ; l'achat ouvre la **feuille Stripe native**.
-- **États vides** : pastille dégradé + titre + sous-titre + CTA bleu.
+- **Galerie = accueil** : en-tête intégré (salutation + titre display) + **puces de filtre**
+  (`Toutes · N` actif bleu nuit / `Aimées · N`), **grille 2 colonnes** de vignettes carrées (rayon
+  20px) avec **cœur** (like) en bas-gauche, **FAB capture** teal flottant centré au-dessus de la tab
+  bar, squelette _shimmer_ pendant la capture, état vide (pastille dégradé + CTA). Tap → visualiseur.
+- **Carte** : Mapbox plein écran, **champ de recherche** flottant en haut (geocoding direct → `flyTo`),
+  **bouton recentrer** en bas-droite, **pins photo ronds** bordés de blanc + pointe losange, **clusters**
+  (pastille teal, `99+` rose), **point « ma position »** teal avec halo qui pulse. Petits clusters →
+  spiderfy ; gros → feuille de lieu.
+- **Boutique** : liste de **cartes** (rayon 24px, ombre douce) — _verrouillée_ : photo floutée +
+  cadenas + « Photo verrouillée » + **lieu révélé** + prix, puis rangée **Acheter** (teal) / **Google
+  Pay** (bleu nuit) ; _débloquée_ : photo nette + badge **Achetée** (teal) + légende lieu · HD.
+- **Visualiseur photo** (modale plein écran) : **toujours sombre** ; carrousel `contain` (photo
+  entière), barre haute (retour · compteur `i/N` · like · corbeille), bas : **épingle teal + lieu**
+  (titre display) + date + badge « Achetée » + **pagination** (points, actif teal allongé).
+- **Modale lieu (cluster)** : feuille draggable — en-tête **lieu teal + « N photos ici »** (display) +
+  fermer neutre, **grille 3 colonnes** de vignettes.
+- **Confirmation de suppression** : alerte iOS, action destructive **en rouge** (`alert-danger`).
+- **Barre d'onglets** : pleine largeur, **verre dépoli**, hairline haute ; icônes pleines à l'actif en
+  **teal**. Ordre : **Galerie · Carte · Boutique** (Galerie par défaut).
 
 ## Layout
 
-- Feed une colonne, gap 22px, padding latéral 14px ; photo de carte 4:5.
+- Écrans **sans barre de nav** : le titre vit dans le contenu (`.page-head`, respecte l'encoche).
+- Galerie/cluster : grille (`grid-template-columns`) ; boutique : pile de cartes (flex colonne).
 - Cibles tactiles ≥ 44px ; safe-area respectée (`viewport-fit=cover`).
-- Tab bar flottante + bouton Snap en `position: fixed` au-dessus.
+- Tab bar + contrôles flottants (FAB, recherche, recentrer) en `position: fixed/absolute`.
 
 ## Motion
 
-120–250 ms, `ease-out`. Pression en `scale`/`opacity`, cœur qui « pop » au like, shimmer du
-skeleton, spinner de carte. Désactivé sous `prefers-reduced-motion: reduce`.
+120–250 ms, `ease-out`. **Pins** : entrée _scale + fade_. **Point position** : halo qui pulse
+(`sm-ping`). **Squelette** : _shimmer_. **Cœur** : _pop_ au like. **Pagination** : point actif qui
+s'allonge. Tout désactivé sous `prefers-reduced-motion: reduce`.
+
+## Écarts assumés vs `SnapMap.dc.html`
+
+- **Boutons sans ombre** (le mock en montre) — préférence utilisateur + lisibilité.
+- **Teal des boutons plus profond** (`#00796B`) que le teal vif du mock — contraste AA du texte blanc.
+- **Visualiseur en `contain`** (photo entière) plutôt que `cover` — un visualiseur doit montrer toute
+  la photo.
+- **Pas d'avatar / pseudo** en galerie (pas de système de compte) — en-tête épuré.
+- **Carte sans volet ni capture** (la capture vit dans le FAB galerie), conforme au mock.
+- **Feuille Stripe** = feuille **native** Stripe (le mock l'illustre, on ne réimplémente pas un
+  formulaire de carte — sécurité + natif). **Écran d'amorce de permission** non construit (le refus de
+  localisation est déjà géré sans bloquer la carte).

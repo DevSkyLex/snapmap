@@ -10,24 +10,15 @@ import {
   ViewChild,
   type WritableSignal,
 } from '@angular/core';
-import {
-  IonButton,
-  IonButtons,
-  IonContent,
-  IonFooter,
-  IonHeader,
-  IonIcon,
-  IonTitle,
-  IonToolbar,
-  ModalController,
-} from '@ionic/angular/standalone';
+import { IonContent, IonIcon, ModalController } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { checkmarkCircle, close, heart, heartOutline, trash } from 'ionicons/icons';
+import { checkmarkCircle, chevronBack, heart, heartOutline, location, trash } from 'ionicons/icons';
 import { FeedbackService } from '@core/feedback';
 import { GeocodingService } from '@core/geocoding';
 import type { UserPhoto } from '@features/photos/models';
 import { PHOTO_LIBRARY } from '@features/photos/ports/photo-library';
 import type { PhotoLibrary } from '@features/photos/ports/photo-library';
+import { ConfirmDialogComponent } from '@shared/components';
 
 /**
  * Component PhotoDetailComponent
@@ -46,17 +37,7 @@ import type { PhotoLibrary } from '@features/photos/ports/photo-library';
   selector: 'app-photo-detail',
   templateUrl: 'photo-detail.component.html',
   styleUrls: ['photo-detail.component.scss'],
-  imports: [
-    IonHeader,
-    IonToolbar,
-    IonTitle,
-    IonButtons,
-    IonButton,
-    IonContent,
-    IonIcon,
-    IonFooter,
-    DatePipe,
-  ],
+  imports: [IonContent, IonIcon, DatePipe],
 })
 export class PhotoDetailComponent implements OnInit {
   //#region Inputs
@@ -200,7 +181,7 @@ export class PhotoDetailComponent implements OnInit {
    * @since 1.0.0
    */
   public constructor() {
-    addIcons({ checkmarkCircle, close, heart, heartOutline, trash });
+    addIcons({ checkmarkCircle, chevronBack, heart, heartOutline, location, trash });
   }
   //#endregion
 
@@ -294,12 +275,21 @@ export class PhotoDetailComponent implements OnInit {
    * @returns {Promise<void>} Resolves once the deletion flow completes.
    */
   public async deletePhoto(): Promise<void> {
-    const confirmed: boolean = await this.feedback.confirm(
-      'Supprimer la photo ?',
-      'Cette action est définitive.',
-      'Supprimer',
-    );
-    if (!confirmed) return;
+    const dialog: HTMLIonModalElement = await this.modalController.create({
+      component: ConfirmDialogComponent,
+      componentProps: {
+        title: 'Supprimer cette photo ?',
+        message: 'Cette action est définitive et ne peut pas être annulée.',
+        confirmText: 'Supprimer',
+        icon: 'trash',
+        danger: true,
+      },
+      cssClass: 'dialog-modal',
+    });
+    await dialog.present();
+
+    const result = await dialog.onDidDismiss<{ confirmed?: boolean }>();
+    if (!result.data?.confirmed) return;
 
     await this.library.deletePhoto(this.photo);
     await this.feedback.toast('Photo supprimée', 'medium');

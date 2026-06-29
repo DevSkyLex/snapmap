@@ -1,35 +1,36 @@
-import { DatePipe } from '@angular/common';
-import { ChangeDetectorRef, Component, inject, type OnInit } from '@angular/core';
-import {
-  IonButton,
-  IonContent,
-  IonHeader,
-  IonIcon,
-  IonTitle,
-  IonToolbar,
-  ModalController,
-} from '@ionic/angular/standalone';
+import { Component, computed, inject, type OnInit, signal, type WritableSignal } from '@angular/core';
+import { IonButton, IonContent, IonIcon, ModalController } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { camera, checkmarkCircle, heart, heartOutline, imagesOutline } from 'ionicons/icons';
+import { camera, heart, heartOutline, location } from 'ionicons/icons';
 import { FeedbackService } from '@core/feedback';
 import { GeocodingService } from '@core/geocoding';
 import { PermissionsService } from '@core/permissions';
 import { PHOTO_LIBRARY, PhotoDetailComponent } from '@features/photos';
 import type { PhotoLibrary, UserPhoto } from '@features/photos';
-import { SkeletonCardComponent } from '@shared/components';
+
+/**
+ * Type GalleryFilter
+ * @typedef {('all' | 'liked')} GalleryFilter
+ *
+ * @description
+ * The active gallery filter chip.
+ *
+ * @since 4.0.0
+ */
+type GalleryFilter = 'all' | 'liked';
 
 /**
  * Component GalleryPageComponent
  * @class GalleryPageComponent
  *
  * @description
- * Gallery tab page: an Instagram-style vertical feed of geotagged photo cards
- * (place + date header, large photo, like, purchased badge). Capture lives in
- * the floating "Snap" button; the detail view (challenge 2) opens on tap and
- * hosts like (challenge 1) and confirmed deletion (challenge 1). Orchestrates
- * through the {@link PHOTO_LIBRARY} port.
+ * Gallery tab page (home): a two-column grid of the user's geotagged photos with
+ * an "all / liked" filter, a floating capture button and a tappable like badge on
+ * each tile. The detail view (challenge 2) opens on tap and hosts like and
+ * confirmed deletion (challenge 1). Orchestrates through the {@link PHOTO_LIBRARY}
+ * port.
  *
- * @version 3.0.0
+ * @version 4.0.0
  *
  * @author Valentin FORTIN <contact@valentin-fortin.pro>
  */
@@ -37,16 +38,7 @@ import { SkeletonCardComponent } from '@shared/components';
   selector: 'app-gallery',
   templateUrl: 'gallery-page.component.html',
   styleUrls: ['gallery-page.component.scss'],
-  imports: [
-    IonHeader,
-    IonToolbar,
-    IonTitle,
-    IonContent,
-    IonIcon,
-    IonButton,
-    DatePipe,
-    SkeletonCardComponent,
-  ],
+  imports: [IonContent, IonIcon, IonButton],
 })
 export class GalleryPageComponent implements OnInit {
   //#region Properties
@@ -63,6 +55,50 @@ export class GalleryPageComponent implements OnInit {
    * @type {PhotoLibrary}
    */
   protected readonly library: PhotoLibrary = inject<PhotoLibrary>(PHOTO_LIBRARY);
+
+  /**
+   * Property filter
+   * @readonly
+   *
+   * @description
+   * The active filter chip (`all` / `liked`).
+   *
+   * @access protected
+   * @since 4.0.0
+   *
+   * @type {WritableSignal<GalleryFilter>}
+   */
+  protected readonly filter: WritableSignal<GalleryFilter> = signal<GalleryFilter>('all');
+
+  /**
+   * Property likedCount
+   * @readonly
+   *
+   * @description
+   * Number of liked photos (drives the "Aimées" chip count).
+   *
+   * @access protected
+   * @since 4.0.0
+   */
+  protected readonly likedCount = computed<number>(
+    () => this.library.photos().filter((photo: UserPhoto) => photo.liked).length,
+  );
+
+  /**
+   * Property visiblePhotos
+   * @readonly
+   *
+   * @description
+   * The photos shown in the grid for the current filter.
+   *
+   * @access protected
+   * @since 4.0.0
+   */
+  protected readonly visiblePhotos = computed<ReadonlyArray<UserPhoto>>(() =>
+    this.filter() === 'liked'
+      ? this.library.photos().filter((photo: UserPhoto) => photo.liked)
+      : this.library.photos(),
+  );
 
   /**
    * Property feedback
@@ -97,7 +133,7 @@ export class GalleryPageComponent implements OnInit {
    * @readonly
    *
    * @description
-   * Reverse geocoding service (resolves each card's place name).
+   * Reverse geocoding service (resolves place names lazily).
    *
    * @access private
    * @since 3.0.0
@@ -119,20 +155,6 @@ export class GalleryPageComponent implements OnInit {
    * @type {ModalController}
    */
   private readonly modalController: ModalController = inject<ModalController>(ModalController);
-
-  /**
-   * Property changeDetector
-   * @readonly
-   *
-   * @description
-   * Change detector used to refresh the feed once place names resolve.
-   *
-   * @access private
-   * @since 3.0.0
-   *
-   * @type {ChangeDetectorRef}
-   */
-  private readonly changeDetector: ChangeDetectorRef = inject<ChangeDetectorRef>(ChangeDetectorRef);
   //#endregion
 
   //#region Constructor
@@ -147,7 +169,7 @@ export class GalleryPageComponent implements OnInit {
    * @since 1.0.0
    */
   public constructor() {
-    addIcons({ camera, checkmarkCircle, heart, heartOutline, imagesOutline });
+    addIcons({ camera, heart, heartOutline, location });
   }
   //#endregion
 
@@ -171,6 +193,24 @@ export class GalleryPageComponent implements OnInit {
   //#endregion
 
   //#region Public Methods
+  /**
+   * Method setFilter
+   * @method setFilter
+   *
+   * @description
+   * Switches the active filter chip.
+   *
+   * @access public
+   * @since 4.0.0
+   *
+   * @param {GalleryFilter} value - The filter to activate.
+   *
+   * @returns {void} Nothing.
+   */
+  public setFilter(value: GalleryFilter): void {
+    this.filter.set(value);
+  }
+
   /**
    * Method takePhoto
    * @method takePhoto
@@ -196,7 +236,7 @@ export class GalleryPageComponent implements OnInit {
     try {
       const photo: UserPhoto | null = await this.library.takePhoto();
       if (photo) {
-        await this.feedback.toast('Photo ajoutée 📸', 'success');
+        await this.feedback.toast('Photo enregistrée', 'success');
         void this.resolvePlaces();
       }
     } catch {
@@ -209,7 +249,7 @@ export class GalleryPageComponent implements OnInit {
    * @method toggleLike
    *
    * @description
-   * Toggles the liked state of a photo from its feed card.
+   * Toggles the liked state of a photo from its grid tile.
    *
    * @access public
    * @since 3.0.0
@@ -239,7 +279,7 @@ export class GalleryPageComponent implements OnInit {
    * @returns {Promise<void>} Resolves once the modal is presented.
    */
   public async openDetail(photo: UserPhoto): Promise<void> {
-    const photos: UserPhoto[] = [...this.library.photos()];
+    const photos: UserPhoto[] = [...this.visiblePhotos()];
     const startIndex: number = photos.indexOf(photo);
 
     const modal: HTMLIonModalElement = await this.modalController.create({
@@ -256,9 +296,8 @@ export class GalleryPageComponent implements OnInit {
    * @method resolvePlaces
    *
    * @description
-   * Reverse-geocodes the place name of every located photo missing one, then
-   * refreshes the feed (OnPush) once resolved. Failures are swallowed so a
-   * missing Mapbox token simply leaves the fallback label.
+   * Reverse-geocodes the place name of every located photo missing one. Failures
+   * are swallowed so a missing Mapbox token simply leaves the fallback label.
    *
    * @access private
    * @since 3.0.0
@@ -276,7 +315,6 @@ export class GalleryPageComponent implements OnInit {
         }
       }),
     );
-    this.changeDetector.markForCheck();
   }
   //#endregion
 }

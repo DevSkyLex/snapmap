@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { IonIcon, IonLabel, IonTabBar, IonTabButton, IonTabs } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { bag, bagOutline, images, imagesOutline, map, mapOutline } from 'ionicons/icons';
+import { bag, bagOutline, grid, gridOutline, location, locationOutline } from 'ionicons/icons';
 
 /**
  * Component TabsLayoutComponent
@@ -33,7 +33,7 @@ export class TabsLayoutComponent {
    * @since 1.0.0
    */
   public constructor() {
-    addIcons({ images, imagesOutline, map, mapOutline, bag, bagOutline });
+    addIcons({ grid, gridOutline, location, locationOutline, bag, bagOutline });
   }
   //#endregion
 }

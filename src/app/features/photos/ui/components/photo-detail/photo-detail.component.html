@@ -1,51 +1,57 @@
-<ion-header class="detail-header">
-  <ion-toolbar>
-    <ion-buttons slot="start">
-      <ion-button class="round" fill="clear" aria-label="Fermer" (click)="dismiss()">
-        <ion-icon slot="icon-only" name="close"></ion-icon>
-      </ion-button>
-    </ion-buttons>
-    <ion-title>{{ current() + 1 }} / {{ photos.length }}</ion-title>
-  </ion-toolbar>
-</ion-header>
-
-<ion-content class="detail-content">
+<ion-content class="detail" [scrollY]="false">
   <div #track class="carousel" (scroll)="onScroll()">
     @for (p of photos; track p.id) {
       <div class="slide">
-        <img [src]="p.webviewPath" alt="Photo" />
+        <img
+          [src]="p.webviewPath"
+          [alt]="'Photo — ' + (p.locationName || 'position enregistrée')"
+        />
+      </div>
+    }
+  </div>
+
+  <div class="scrim scrim--top"></div>
+  <div class="scrim scrim--bottom"></div>
+
+  <!-- Barre supérieure : retour · compteur · actions -->
+  <div class="topbar">
+    <button type="button" class="round" aria-label="Fermer" (click)="dismiss()">
+      <ion-icon name="chevron-back"></ion-icon>
+    </button>
+    <span class="counter">{{ current() + 1 }} / {{ photos.length }}</span>
+    <div class="acts">
+      <button
+        type="button"
+        class="round"
+        [class.liked]="photo.liked"
+        [attr.aria-label]="photo.liked ? 'Retirer des aimées' : 'Aimer la photo'"
+        (click)="toggleLike()"
+      >
+        <ion-icon [name]="photo.liked ? 'heart' : 'heart-outline'"></ion-icon>
+      </button>
+      <button type="button" class="round" aria-label="Supprimer la photo" (click)="deletePhoto()">
+        <ion-icon name="trash"></ion-icon>
+      </button>
+    </div>
+  </div>
+
+  <!-- Bas : lieu · date · pastille achetée · pagination -->
+  <div class="info">
+    <div class="place-row">
+      <ion-icon name="location"></ion-icon>
+      <span class="place">{{ photo.locationName || 'Position enregistrée' }}</span>
+      @if (photo.purchased) {
+        <span class="badge"><ion-icon name="checkmark-circle"></ion-icon> Achetée</span>
+      }
+    </div>
+    <span class="date">{{ photo.date | date: 'd MMMM yyyy · HH:mm' }}</span>
+
+    @if (photos.length > 1 && photos.length <= 7) {
+      <div class="dots">
+        @for (p of photos; track p.id; let i = $index) {
+          <span class="dot" [class.active]="i === current()"></span>
+        }
       </div>
     }
   </div>
 </ion-content>
-
-<ion-footer class="detail-footer">
-  <ion-toolbar>
-    <div class="info">
-      <div class="meta">
-        <div class="place-row">
-          <span class="place">{{ photo.locationName || 'Position enregistrée' }}</span>
-          @if (photo.purchased) {
-            <span class="badge"><ion-icon name="checkmark-circle"></ion-icon> Achetée</span>
-          }
-        </div>
-        <span class="date">{{ photo.date | date: 'd MMM yyyy à HH:mm' }}</span>
-      </div>
-
-      <div class="actions">
-        <button type="button" class="act like" [class.liked]="photo.liked" (click)="toggleLike()">
-          <ion-icon [name]="photo.liked ? 'heart' : 'heart-outline'"></ion-icon>
-          <span>{{ photo.liked ? 'Aimée' : "J'aime" }}</span>
-        </button>
-        <button
-          type="button"
-          class="act del"
-          aria-label="Supprimer la photo"
-          (click)="deletePhoto()"
-        >
-          <ion-icon name="trash"></ion-icon>
-        </button>
-      </div>
-    </div>
-  </ion-toolbar>
-</ion-footer>

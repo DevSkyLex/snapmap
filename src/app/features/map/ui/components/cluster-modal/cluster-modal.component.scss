@@ -1,32 +1,97 @@
+.cluster {
+  --background: var(--surface);
+}
+
+/* En-tête : lieu (teal) + nombre de photos, bouton fermer neutre */
+.head {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 18px 14px;
+  background: var(--surface);
+
+  .who {
+    min-width: 0;
+  }
+
+  .loc {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    overflow: hidden;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--accent-text);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    ion-icon {
+      flex: none;
+      font-size: 15px;
+    }
+  }
+
+  h2 {
+    margin: 5px 0 0;
+    font-family: var(--font-display);
+    font-size: 1.4rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+  }
+
+  .close {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    border: 0;
+    border-radius: 50%;
+    background: var(--grouped);
+    color: var(--secondary);
+    cursor: pointer;
+    transition: background-color 0.15s var(--ease);
+
+    ion-icon {
+      font-size: 18px;
+    }
+
+    &:active {
+      background: var(--separator);
+    }
+  }
+}
+
+/* Grille de vignettes (toutes les photos de ce lieu) */
 .thumb-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 2px;
+  gap: 9px;
+  padding: 4px 16px 20px;
 }
 
 .thumb {
   aspect-ratio: 1;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius);
   overflow: hidden;
+  background: var(--grouped);
   cursor: pointer;
-  background: var(--bg-grouped);
-
-  &:active img {
-    opacity: 0.85;
-  }
 
   img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    transition: opacity 0.15s var(--ease);
   }
-}
 
-ion-button.round {
-  --color: var(--ink);
-  --padding-start: 4px;
-  --padding-end: 4px;
-
-  ion-icon {
-    font-size: 24px;
+  &:active img {
+    opacity: 0.82;
   }
 }

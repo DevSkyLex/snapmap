@@ -1,34 +1,100 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>Boutique</ion-title>
-  </ion-toolbar>
-</ion-header>
-
-<ion-content>
+<ion-content [fullscreen]="true">
   @if (library.photos().length) {
-    <div class="photo-grid">
-      @for (photo of library.photos(); track photo.id) {
-        <div class="card" [class.locked]="!photo.purchased">
-          <img [src]="photo.webviewPath" alt="Photo" loading="lazy" />
+    <header class="page-head head">
+      <div class="titles">
+        <h1>Boutique</h1>
+        <span class="greeting">{{ lockedCount() }} photo{{ lockedCount() > 1 ? 's' : '' }} verrouillée{{ lockedCount() > 1 ? 's' : '' }}</span>
+      </div>
+      <span class="bought-pill">
+        <ion-icon name="checkmark-circle"></ion-icon>
+        {{ purchasedCount() }} achetée{{ purchasedCount() > 1 ? 's' : '' }}
+      </span>
+    </header>
 
-          @if (!photo.purchased) {
-            <div class="lock-overlay">
-              <ion-icon class="lock" name="lock-closed"></ion-icon>
-              <span class="price">5 €</span>
-              <div class="buy">
-                <ion-button class="btn-primary" size="small" (click)="buyPhoto(photo.id)">
-                  <ion-icon slot="start" name="card-outline"></ion-icon>
-                  Carte
-                </ion-button>
-                <ion-button size="small" color="dark" (click)="buyPhotoWithGooglePay(photo.id)">
-                  Google&nbsp;Pay
-                </ion-button>
-              </div>
-            </div>
-          } @else {
-            <span class="unlocked"><ion-icon name="lock-open"></ion-icon></span>
-          }
-        </div>
+    @if (bundle(); as offer) {
+      <button type="button" class="bundle" (click)="buyBundle(offer)">
+        <span class="glow" aria-hidden="true"></span>
+        <span class="bundle-copy">
+          <span class="tag"><ion-icon name="sparkles"></ion-icon> Offre lieu</span>
+          <span class="bundle-title">Tout débloquer<br />{{ offer.place }}</span>
+          <span class="bundle-price">
+            <strong>{{ offer.price }} €</strong>
+            <s>{{ offer.original }} €</s>
+            <em>{{ offer.count }} photos</em>
+          </span>
+        </span>
+        <span class="bundle-go" aria-hidden="true"><ion-icon name="arrow-forward"></ion-icon></span>
+      </button>
+    }
+
+    <div class="chips" role="tablist" aria-label="Filtrer la boutique">
+      <button
+        type="button"
+        role="tab"
+        class="chip"
+        [class.active]="filter() === 'all'"
+        [attr.aria-selected]="filter() === 'all'"
+        (click)="setFilter('all')"
+      >
+        Toutes
+      </button>
+      <button
+        type="button"
+        role="tab"
+        class="chip"
+        [class.active]="filter() === 'locked'"
+        [attr.aria-selected]="filter() === 'locked'"
+        (click)="setFilter('locked')"
+      >
+        Verrouillées
+      </button>
+      <button
+        type="button"
+        role="tab"
+        class="chip"
+        [class.active]="filter() === 'purchased'"
+        [attr.aria-selected]="filter() === 'purchased'"
+        (click)="setFilter('purchased')"
+      >
+        Achetées
+      </button>
+    </div>
+
+    <div class="grid">
+      @for (photo of visiblePhotos(); track photo.id) {
+        @if (!photo.purchased) {
+          <button
+            type="button"
+            class="tile locked"
+            [attr.aria-label]="'Acheter — ' + (photo.locationName || 'lieu enregistré') + ' · 5 €'"
+            (click)="buyPhoto(photo)"
+          >
+            <img class="shot blur" [src]="photo.webviewPath" alt="" loading="lazy" />
+            <span class="scrim" aria-hidden="true"></span>
+            <span class="lock-chip"><ion-icon name="lock-closed"></ion-icon></span>
+            <span class="foot">
+              <span class="loc">
+                <ion-icon name="location"></ion-icon>{{ photo.locationName || 'Lieu enregistré' }}
+              </span>
+              <span class="price-btn"><ion-icon name="card-outline"></ion-icon> 5,00 €</span>
+            </span>
+          </button>
+        } @else {
+          <button
+            type="button"
+            class="tile unlocked"
+            [attr.aria-label]="'Voir en HD — ' + (photo.locationName || 'lieu enregistré')"
+            (click)="openPhoto(photo)"
+          >
+            <img class="shot" [src]="photo.webviewPath" alt="" loading="lazy" />
+            <span class="badge"><ion-icon name="checkmark-circle"></ion-icon> Débloquée</span>
+            <span class="foot single">
+              <span class="hd-btn"><ion-icon name="download-outline"></ion-icon> HD</span>
+            </span>
+          </button>
+        }
+      } @empty {
+        <p class="filter-empty">Aucune photo dans ce filtre.</p>
       }
     </div>
   } @else {

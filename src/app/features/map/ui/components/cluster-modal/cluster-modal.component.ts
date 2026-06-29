@@ -1,16 +1,7 @@
 import { Component, inject, Input } from '@angular/core';
-import {
-  IonButton,
-  IonButtons,
-  IonContent,
-  IonHeader,
-  IonIcon,
-  IonTitle,
-  IonToolbar,
-  ModalController,
-} from '@ionic/angular/standalone';
+import { IonContent, IonIcon, ModalController } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { close } from 'ionicons/icons';
+import { close, location } from 'ionicons/icons';
 import type { UserPhoto } from '@features/photos/models';
 
 /**
@@ -18,11 +9,12 @@ import type { UserPhoto } from '@features/photos/models';
  * @class ClusterModalComponent
  *
  * @description
- * Internal widget of the "map" feature (challenge 3): full-screen modal listing
- * the photos of a single place (a cluster with many photos). Tapping a photo
- * dismisses the modal with the id to open.
+ * Internal widget of the "map" feature (challenge 3): a **sheet modal** listing
+ * the photos of a single place (a busy cluster). Headed by the app's geo-tag
+ * vocabulary (coral pin + place + GPS coordinates). Tapping a photo dismisses
+ * the modal with the id to open.
  *
- * @version 1.0.0
+ * @version 2.0.0
  *
  * @author Valentin FORTIN <contact@valentin-fortin.pro>
  */
@@ -30,7 +22,7 @@ import type { UserPhoto } from '@features/photos/models';
   selector: 'app-cluster-modal',
   templateUrl: 'cluster-modal.component.html',
   styleUrls: ['cluster-modal.component.scss'],
-  imports: [IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonContent, IonIcon],
+  imports: [IonContent, IonIcon],
 })
 export class ClusterModalComponent {
   //#region Inputs
@@ -64,6 +56,24 @@ export class ClusterModalComponent {
   private readonly modalController: ModalController = inject<ModalController>(ModalController);
   //#endregion
 
+  //#region Accessors
+  /**
+   * Property place
+   * @readonly
+   *
+   * @description
+   * The cluster's place label (the first photo's resolved name, with fallback).
+   *
+   * @access protected
+   * @since 2.0.0
+   *
+   * @type {string}
+   */
+  protected get place(): string {
+    return this.photos[0]?.locationName ?? 'Ce lieu';
+  }
+  //#endregion
+
   //#region Constructor
   /**
    * Constructor
@@ -76,7 +86,7 @@ export class ClusterModalComponent {
    * @since 1.0.0
    */
   public constructor() {
-    addIcons({ close });
+    addIcons({ close, location });
   }
   //#endregion
 

@@ -2,14 +2,11 @@
 // Pour ce concours, mettez les MÊMES clés que dans environment.ts (cf. sujet).
 export const environment = {
   production: true,
-
-  api: 'http://localhost:4000/',
-
+  api: 'http://192.168.1.15:4000/',
   mapBox: {
-    accessToken: 'pk.VOTRE_TOKEN_MAPBOX',
+    accessToken: '',
   },
-
   stripe: {
-    publishableKey: 'pk_test_VOTRE_CLE_PUBLIQUE',
+    publishableKey: '',
   },
 };

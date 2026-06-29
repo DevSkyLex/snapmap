@@ -4,8 +4,16 @@
     {
       "name": "snapmap",
       "runtimeExecutable": "npx",
-      "runtimeArgs": ["ng", "serve", "--port", "8100", "--configuration", "development"],
-      "port": 8100
+      "runtimeArgs": ["ng", "serve", "--configuration", "development"],
+      "port": 8100,
+      "autoPort": true
+    },
+    {
+      "name": "snapmap-design",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["ng", "serve", "--configuration", "development"],
+      "port": 8130,
+      "autoPort": true
     }
   ]
 }

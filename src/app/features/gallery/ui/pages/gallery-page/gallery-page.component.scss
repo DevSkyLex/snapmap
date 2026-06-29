@@ -1,198 +1,192 @@
-/* Feed plein écran : un élément = toute la hauteur, défilement par à-coups */
-ion-content::part(scroll) {
-  scroll-snap-type: y mandatory;
-}
-
-.feed {
+/* En-tête : salutation + titre display, pastille de marque à droite */
+.head {
   display: flex;
-  flex-direction: column;
-}
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
 
-.post {
-  position: relative;
-  height: 100dvh;
-  overflow: hidden;
-  background: #000;
-  scroll-snap-align: start;
-  scroll-snap-stop: always;
-  cursor: pointer;
-}
-
-/* Fond flouté (remplit l'écran sans rogner la photo nette) */
-.post-blur {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  filter: blur(28px) brightness(0.5);
-  transform: scale(1.18);
-}
-
-/* Photo nette, contenue */
-.post-bg {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
-
-.scrim {
-  position: absolute;
-  left: 0;
-  right: 0;
-  pointer-events: none;
-
-  &--top {
-    top: 0;
-    height: 38%;
-    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.55), transparent);
-  }
-
-  &--bottom {
-    bottom: 0;
-    height: 42%;
-    background: linear-gradient(to top, rgba(0, 0, 0, 0.6), transparent);
-  }
-}
-
-/* En-tête lieu / date (sous la barre de nav) */
-.post-head {
-  position: absolute;
-  top: calc(env(safe-area-inset-top) + 58px);
-  left: 16px;
-  right: 16px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  color: #fff;
-
-  .avatar {
+  .logo {
     flex: none;
-    width: 38px;
-    height: 38px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 1.5px solid rgba(255, 255, 255, 0.85);
-  }
-
-  .who {
-    display: flex;
-    flex-direction: column;
-    min-width: 0;
-  }
-
-  .place {
-    overflow: hidden;
-    font-size: 0.95rem;
-    font-weight: 700;
-    letter-spacing: -0.01em;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
-  }
-
-  .when {
-    font-size: 0.78rem;
-    color: rgba(255, 255, 255, 0.85);
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
-  }
-
-  /* Badge « Acheté » (sous la date) */
-  .badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    width: fit-content;
-    margin-top: 5px;
-    padding: 3px 9px;
-    border-radius: 999px;
-    background: rgba(48, 209, 88, 0.22);
-    font-size: 0.74rem;
-    font-weight: 700;
-    text-shadow: none;
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+    background: var(--accent-grad);
+    box-shadow: 0 10px 22px -10px rgba(0, 194, 168, 0.8);
 
     ion-icon {
-      font-size: 14px;
-      color: var(--success);
+      font-size: 22px;
+      color: #fff;
     }
   }
 }
 
-/* Bouton like (bas-droite, au-dessus de la tab bar) */
+/* Filtres (puces) */
+.chips {
+  display: flex;
+  gap: 8px;
+  padding: 12px 22px 6px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 15px;
+  border: 0.5px solid var(--separator-strong);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--secondary);
+  font-size: 0.84rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  transition:
+    background-color 0.15s var(--ease),
+    color 0.15s var(--ease);
+
+  ion-icon {
+    font-size: 15px;
+    color: var(--like);
+  }
+
+  &.active {
+    border-color: transparent;
+    background: var(--ink);
+    color: var(--surface); /* inverse de --ink : lisible en clair comme en sombre */
+
+    ion-icon {
+      color: var(--like);
+    }
+  }
+}
+
+/* Grille 2 colonnes */
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  padding: 12px 16px calc(150px + env(safe-area-inset-bottom));
+}
+
+.tile {
+  position: relative;
+  aspect-ratio: 3 / 4; /* portrait « format téléphone » (les photos ne sont plus rognées en carré) */
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: var(--grouped);
+  box-shadow: var(--shadow-card);
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+/* Calque d'ouverture (plein cadre, sous le like) */
+.tile-open {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  appearance: none;
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: 3px solid var(--accent);
+    outline-offset: -3px;
+    border-radius: var(--radius-lg);
+  }
+}
+
+/* Bouton like (coin bas-gauche, au-dessus du calque) */
 .like {
   position: absolute;
-  right: 16px;
-  bottom: calc(150px + env(safe-area-inset-bottom));
+  z-index: 2;
+  left: 10px;
+  bottom: 10px;
   display: grid;
   place-items: center;
-  width: 52px;
-  height: 52px;
+  width: 32px;
+  height: 32px;
   border: 0;
   border-radius: 50%;
-  background: rgba(0, 0, 0, 0.32);
+  background: rgba(14, 23, 38, 0.4);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
   color: #fff;
   cursor: pointer;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
   transition: transform 0.12s var(--ease);
 
-  &:active {
-    transform: scale(0.9);
+  ion-icon {
+    font-size: 16px;
   }
+
+  &:active {
+    transform: scale(0.88);
+  }
+
+  &.liked {
+    ion-icon {
+      color: var(--like);
+      animation: heart-pop 0.35s var(--ease);
+    }
+  }
+}
+
+/* Tuile squelette (capture en cours) */
+.tile--loading {
+  aspect-ratio: 3 / 4;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(
+    100deg,
+    var(--grouped) 30%,
+    var(--surface-2) 50%,
+    var(--grouped) 70%
+  );
+  background-size: 340px 100%;
+  animation: sm-shimmer 1.3s infinite linear;
+}
+
+.filter-empty {
+  grid-column: 1 / -1;
+  margin: 18px 0;
+  text-align: center;
+  color: var(--secondary);
+  font-size: 0.92rem;
+}
+
+/* Bouton de capture flottant */
+.fab {
+  position: fixed;
+  left: 50%;
+  bottom: calc(74px + env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  z-index: var(--z-sticky);
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border: 4px solid var(--bg);
+  border-radius: 50%;
+  background: var(--accent-grad);
+  color: #fff;
+  cursor: pointer;
+  box-shadow: 0 16px 30px -10px rgba(0, 162, 196, 0.6);
+  transition: transform 0.12s var(--ease);
 
   ion-icon {
     font-size: 28px;
   }
 
-  &.liked ion-icon {
-    color: var(--like);
-    animation: heart-pop 0.35s var(--ease);
-  }
-}
-
-.post--loading {
-  display: block;
-
-  app-skeleton-card {
-    display: block;
-    width: 100%;
-    height: 100%;
-  }
-}
-
-/* Bouton Snap flottant (capture) */
-.snap-fab {
-  position: fixed;
-  left: 50%;
-  bottom: calc(86px + env(safe-area-inset-bottom));
-  transform: translateX(-50%);
-  z-index: var(--z-sticky);
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  height: 50px;
-  padding: 0 22px;
-  border: 0;
-  border-radius: 25px;
-  background: var(--accent);
-  color: #fff;
-  font-size: 1rem;
-  font-weight: 700;
-  letter-spacing: -0.01em;
-  cursor: pointer;
-  box-shadow: 0 12px 28px -8px rgba(10, 132, 255, 0.7);
-  transition:
-    transform 0.12s var(--ease),
-    opacity 0.12s;
-
-  ion-icon {
-    font-size: 20px;
-  }
-
   &:active {
-    transform: translateX(-50%) scale(0.96);
+    transform: translateX(-50%) scale(0.94);
   }
 
   &.busy {
@@ -201,33 +195,36 @@ ion-content::part(scroll) {
   }
 }
 
+/* État vide */
 .empty {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 12px;
-  padding: 16% 32px 0;
+  padding: 22% 32px 0;
   text-align: center;
 
   .empty-icon {
     display: grid;
     place-items: center;
-    width: 84px;
-    height: 84px;
+    width: 88px;
+    height: 88px;
     margin-bottom: 4px;
-    border-radius: 22px;
-    background: var(--ig-grad);
+    border-radius: 26px;
+    background: var(--accent-grad);
+    box-shadow: 0 18px 34px -14px rgba(0, 162, 196, 0.7);
 
     ion-icon {
-      font-size: 38px;
+      font-size: 40px;
       color: #fff;
     }
   }
 
   h2 {
     margin: 0;
-    font-size: 1.4rem;
-    font-weight: 800;
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 700;
     letter-spacing: -0.02em;
     color: var(--ink);
     text-wrap: balance;
@@ -235,7 +232,7 @@ ion-content::part(scroll) {
 
   p {
     margin: 0;
-    max-width: 30ch;
+    max-width: 32ch;
     color: var(--secondary);
     font-size: 0.95rem;
     line-height: 1.5;
@@ -245,18 +242,6 @@ ion-content::part(scroll) {
     margin-top: 8px;
     --padding-start: 22px;
     --padding-end: 22px;
-    height: 44px;
-  }
-}
-
-@keyframes heart-pop {
-  0% {
-    transform: scale(1);
-  }
-  40% {
-    transform: scale(1.3);
-  }
-  100% {
-    transform: scale(1);
+    height: 48px;
   }
 }

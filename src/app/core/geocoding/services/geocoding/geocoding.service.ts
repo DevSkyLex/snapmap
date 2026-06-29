@@ -12,7 +12,10 @@ import type { EnvironmentConfig } from '@core/config';
  * @since 1.0.0
  */
 interface MapboxGeocodingResponse {
-  readonly features?: ReadonlyArray<{ readonly place_name?: string }>;
+  readonly features?: ReadonlyArray<{
+    readonly place_name?: string;
+    readonly center?: readonly number[];
+  }>;
 }
 
 /**
@@ -97,6 +100,42 @@ export class GeocodingService {
       return name;
     } catch {
       return 'Localisation indisponible';
+    }
+  }
+
+  /**
+   * Method forwardGeocode
+   * @method forwardGeocode
+   *
+   * @description
+   * Resolves the coordinates of a place name typed in the map search field. Never
+   * rejects: returns `null` when nothing matches or the request fails.
+   *
+   * @access public
+   * @since 4.0.0
+   *
+   * @param {string} query - The free-text place to look up.
+   *
+   * @returns {Promise<[number, number] | null>} The `[lng, lat]`, or `null`.
+   */
+  public async forwardGeocode(query: string): Promise<[number, number] | null> {
+    const trimmed: string = query.trim();
+    if (!trimmed) return null;
+
+    const token: string = this.env.mapBox.accessToken;
+    const url: string =
+      `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(trimmed)}.json` +
+      `?access_token=${token}&language=fr&limit=1`;
+
+    try {
+      const response: Response = await fetch(url);
+      if (!response.ok) return null;
+
+      const data = (await response.json()) as MapboxGeocodingResponse;
+      const center: readonly number[] | undefined = data.features?.[0]?.center;
+      return center && center.length === 2 ? [center[0] as number, center[1] as number] : null;
+    } catch {
+      return null;
     }
   }
   //#endregion

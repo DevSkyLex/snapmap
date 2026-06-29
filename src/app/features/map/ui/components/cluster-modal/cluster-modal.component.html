@@ -1,20 +1,24 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-title>{{ photos.length }} photos ici</ion-title>
-    <ion-buttons slot="end">
-      <ion-button class="round" fill="clear" aria-label="Fermer" (click)="dismiss()">
-        <ion-icon slot="icon-only" name="close"></ion-icon>
-      </ion-button>
-    </ion-buttons>
-  </ion-toolbar>
-</ion-header>
+<ion-content class="cluster">
+  <header class="head">
+    <div class="who">
+      <span class="loc"><ion-icon name="location" aria-hidden="true"></ion-icon>{{ place }}</span>
+      <h2>{{ photos.length }} photo{{ photos.length > 1 ? 's' : '' }} ici</h2>
+    </div>
+    <button type="button" class="close" aria-label="Fermer" (click)="dismiss()">
+      <ion-icon name="close" aria-hidden="true"></ion-icon>
+    </button>
+  </header>
 
-<ion-content>
   <div class="thumb-grid">
     @for (photo of photos; track photo.id) {
-      <div class="thumb" (click)="open(photo)">
-        <img [src]="photo.webviewPath" alt="Photo" loading="lazy" />
-      </div>
+      <button type="button" class="thumb" (click)="open(photo)">
+        <img
+          [src]="photo.webviewPath"
+          [alt]="'Photo — ' + (photo.locationName || place)"
+          loading="lazy"
+          decoding="async"
+        />
+      </button>
     }
   </div>
 </ion-content>

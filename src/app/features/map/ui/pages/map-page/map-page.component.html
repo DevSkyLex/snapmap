@@ -1,10 +1,5 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>Carte</ion-title>
-  </ion-toolbar>
-</ion-header>
-
 <ion-content [fullscreen]="true">
+  <h1 class="sr-only">Carte de vos souvenirs</h1>
   <div class="map-ctn">
     @if (!mapLoaded()) {
       <div class="loading-ctn">
@@ -13,5 +8,21 @@
       </div>
     }
     <div id="map" class="map"></div>
+
+    <form class="search" (submit)="search(field.value); $event.preventDefault()">
+      <ion-icon name="search" aria-hidden="true"></ion-icon>
+      <input
+        #field
+        type="search"
+        class="search-input"
+        placeholder="Rechercher un lieu"
+        aria-label="Rechercher un lieu"
+        enterkeyhint="search"
+      />
+    </form>
+
+    <button type="button" class="recenter" aria-label="Recentrer sur ma position" (click)="recenter()">
+      <ion-icon name="locate" aria-hidden="true"></ion-icon>
+    </button>
   </div>
 </ion-content>

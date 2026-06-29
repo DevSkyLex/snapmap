@@ -3,6 +3,7 @@ import * as mapboxgl from 'mapbox-gl';
 import { ENV_CONFIG } from '@core/config';
 import type { EnvironmentConfig } from '@core/config';
 import type { UserPhoto } from '@features/photos/models';
+import type { StyleSpecification } from 'mapbox-gl';
 
 /**
  * Type LocatedPhoto
@@ -63,6 +64,51 @@ type FeatureProperties = PhotoFeatureProperties | ClusterFeatureProperties;
  * @since 1.0.0
  */
 const DEFAULT_CENTER: readonly [number, number] = [2.3522, 48.8566];
+
+type MapTheme = 'light' | 'dark';
+
+interface MapPalette {
+  readonly background: string;
+  readonly land: string;
+  readonly park: string;
+  readonly water: string;
+  readonly roadMinor: string;
+  readonly roadMajor: string;
+  readonly roadCasing: string;
+  readonly building: string;
+  readonly label: string;
+  readonly labelHalo: string;
+  readonly labelMuted: string;
+}
+
+const MAP_PALETTES: Record<MapTheme, MapPalette> = {
+  light: {
+    background: '#e7e9ee',
+    land: '#eef1f4',
+    park: '#d7f2ed',
+    water: '#bde8f2',
+    roadMinor: '#ffffff',
+    roadMajor: '#f8ffff',
+    roadCasing: '#d6dae1',
+    building: '#dfe4ea',
+    label: '#0e1726',
+    labelHalo: '#f7f9fb',
+    labelMuted: '#5f6b7c',
+  },
+  dark: {
+    background: '#0b0e14',
+    land: '#11151c',
+    park: '#102821',
+    water: '#082633',
+    roadMinor: '#26313d',
+    roadMajor: '#344956',
+    roadCasing: '#0b0e14',
+    building: '#1b212c',
+    label: '#f2f4f8',
+    labelHalo: '#0b0e14',
+    labelMuted: '#9aa3b0',
+  },
+};
 
 /**
  * Constant SPIDER_MAX
@@ -133,6 +179,9 @@ export class MapService {
    */
   private readonly leafThumbCache: Map<number, string> = new Map<number, string>();
 
+  private readonly darkThemeMedia: MediaQueryList | undefined =
+    typeof window === 'undefined' ? undefined : window.matchMedia('(prefers-color-scheme: dark)');
+
   /**
    * Property map
    *
@@ -145,6 +194,40 @@ export class MapService {
    * @type {mapboxgl.Map | undefined}
    */
   private map: mapboxgl.Map | undefined;
+
+  private currentTheme: MapTheme = this.resolveMapTheme();
+
+  private isRenderListenerBound = false;
+
+  private readonly onThemeChange = (): void => this.applyThemeStyle();
+
+  private readonly lastPhotos: UserPhoto[] = [];
+
+  /**
+   * Property userMarker
+   *
+   * @description
+   * The pulsing "my position" marker, when geolocation is available.
+   *
+   * @access private
+   * @since 4.0.0
+   *
+   * @type {mapboxgl.Marker | undefined}
+   */
+  private userMarker: mapboxgl.Marker | undefined;
+
+  /**
+   * Property userCenter
+   *
+   * @description
+   * The last known user coordinates, used to recenter the map.
+   *
+   * @access private
+   * @since 4.0.0
+   *
+   * @type {[number, number] | undefined}
+   */
+  private userCenter: [number, number] | undefined;
 
   /**
    * Property markersOnScreen
@@ -222,13 +305,39 @@ export class MapService {
       const map: mapboxgl.Map = new mapboxgl.Map({
         accessToken: this.env.mapBox.accessToken,
         container,
-        style: 'mapbox://styles/mapbox/streets-v12',
+        style: this.createMapStyle(this.currentTheme),
         zoom: center ? 13 : 4,
         center: [resolvedCenter[0], resolvedCenter[1]],
       });
       this.map = map;
-      map.on('load', () => resolve());
-      map.on('error', (event) => reject(event.error));
+      this.darkThemeMedia?.addEventListener('change', this.onThemeChange);
+      map.on('style.load', () => this.restorePhotoSource());
+
+      let settled = false;
+      const succeed = (): void => {
+        if (settled) return;
+        settled = true;
+        resolve();
+      };
+
+      map.on('load', () => succeed());
+      map.on('error', (event) => {
+        const error = event.error as (Error & { status?: number }) | undefined;
+        // Seules les erreurs d'authentification (token absent/refusé) sont
+        // bloquantes. Les aléas non fatals (tuile, source-layer, sprite) ne
+        // doivent pas empêcher l'affichage de la carte.
+        if (!settled && (error?.status === 401 || error?.status === 403)) {
+          settled = true;
+          reject(error);
+          return;
+        }
+        // eslint-disable-next-line no-console
+        console.warn('Mapbox (non bloquant) :', error?.message ?? error);
+      });
+
+      // Filet de sécurité : si « load » ne se déclenche jamais, on évite de
+      // bloquer indéfiniment le spinner de la carte.
+      globalThis.setTimeout(() => succeed(), 6000);
     });
   }
 
@@ -249,6 +358,227 @@ export class MapService {
   public renderPhotos(photos: ReadonlyArray<UserPhoto>): void {
     const map: mapboxgl.Map | undefined = this.map;
     if (!map) return;
+
+    this.lastPhotos.splice(0, this.lastPhotos.length, ...photos);
+    this.renderPhotoSource(photos);
+  }
+  public destroy(): void {
+    this.darkThemeMedia?.removeEventListener('change', this.onThemeChange);
+    for (const marker of Object.values(this.markersOnScreen)) marker.remove();
+    this.markersOnScreen = {};
+    this.userMarker?.remove();
+    this.userMarker = undefined;
+    this.clearSpider();
+    this.map?.remove();
+    this.map = undefined;
+    this.isRenderListenerBound = false;
+  }
+  //#endregion
+
+  //#region Private Methods
+  private resolveMapTheme(): MapTheme {
+    return this.darkThemeMedia?.matches ? 'dark' : 'light';
+  }
+
+  private applyThemeStyle(): void {
+    const map: mapboxgl.Map | undefined = this.map;
+    const nextTheme: MapTheme = this.resolveMapTheme();
+    if (!map || nextTheme === this.currentTheme) return;
+
+    this.currentTheme = nextTheme;
+    this.clearSpider();
+    map.setStyle(this.createMapStyle(nextTheme));
+  }
+
+  private createMapStyle(theme: MapTheme): StyleSpecification {
+    const palette: MapPalette = MAP_PALETTES[theme];
+
+    return {
+      version: 8,
+      name: `SnapMap ${theme}`,
+      glyphs: 'mapbox://fonts/mapbox/{fontstack}/{range}.pbf',
+      sources: {
+        streets: {
+          type: 'vector',
+          url: 'mapbox://mapbox.mapbox-streets-v8',
+        },
+      },
+      layers: [
+        {
+          id: 'snapmap-background',
+          type: 'background',
+          paint: { 'background-color': palette.background },
+        },
+        {
+          id: 'snapmap-land',
+          type: 'fill',
+          source: 'streets',
+          'source-layer': 'landuse',
+          paint: { 'fill-color': palette.land },
+        },
+        {
+          id: 'snapmap-park',
+          type: 'fill',
+          source: 'streets',
+          'source-layer': 'landuse',
+          filter: ['match', ['get', 'class'], ['park', 'wood', 'grass', 'cemetery'], true, false],
+          paint: {
+            'fill-color': palette.park,
+            'fill-opacity': theme === 'dark' ? 0.5 : 0.72,
+          },
+        },
+        {
+          id: 'snapmap-water',
+          type: 'fill',
+          source: 'streets',
+          'source-layer': 'water',
+          paint: { 'fill-color': palette.water },
+        },
+        {
+          id: 'snapmap-building',
+          type: 'fill',
+          source: 'streets',
+          'source-layer': 'building',
+          minzoom: 14,
+          paint: {
+            'fill-color': palette.building,
+            'fill-opacity': theme === 'dark' ? 0.5 : 0.64,
+          },
+        },
+        {
+          id: 'snapmap-road-casing',
+          type: 'line',
+          source: 'streets',
+          'source-layer': 'road',
+          paint: {
+            'line-color': palette.roadCasing,
+            'line-width': ['interpolate', ['linear'], ['zoom'], 5, 0.6, 12, 2, 16, 8],
+          },
+        },
+        {
+          id: 'snapmap-road-minor',
+          type: 'line',
+          source: 'streets',
+          'source-layer': 'road',
+          filter: [
+            'match',
+            ['get', 'class'],
+            ['street', 'street_limited', 'service', 'track', 'path'],
+            true,
+            false,
+          ],
+          paint: {
+            'line-color': palette.roadMinor,
+            'line-opacity': theme === 'dark' ? 0.58 : 0.86,
+            'line-width': ['interpolate', ['linear'], ['zoom'], 5, 0.25, 12, 1.1, 16, 5],
+          },
+        },
+        {
+          id: 'snapmap-road-major',
+          type: 'line',
+          source: 'streets',
+          'source-layer': 'road',
+          filter: [
+            'match',
+            ['get', 'class'],
+            ['motorway', 'trunk', 'primary', 'secondary', 'tertiary'],
+            true,
+            false,
+          ],
+          paint: {
+            'line-color': palette.roadMajor,
+            'line-opacity': theme === 'dark' ? 0.8 : 0.96,
+            'line-width': ['interpolate', ['linear'], ['zoom'], 5, 0.8, 12, 2.3, 16, 9],
+          },
+        },
+        {
+          id: 'snapmap-water-label',
+          type: 'symbol',
+          source: 'streets',
+          // Streets v8 : les labels d'eau sont dans `natural_label` (pas de `water_label`).
+          'source-layer': 'natural_label',
+          filter: [
+            'match',
+            ['get', 'class'],
+            ['sea', 'ocean', 'bay', 'water', 'river', 'reservoir', 'lake', 'dock', 'canal'],
+            true,
+            false,
+          ],
+          layout: {
+            'text-field': ['coalesce', ['get', 'name_fr'], ['get', 'name_en'], ['get', 'name']],
+            'text-font': ['DIN Pro Medium', 'Arial Unicode MS Regular'],
+            'text-size': ['interpolate', ['linear'], ['zoom'], 5, 11, 14, 14],
+          },
+          paint: {
+            'text-color': theme === 'dark' ? '#55cfe3' : '#007f99',
+            'text-halo-color': palette.labelHalo,
+            'text-halo-width': 1,
+          },
+        },
+        {
+          id: 'snapmap-road-label',
+          type: 'symbol',
+          source: 'streets',
+          // Streets v8 : les noms de routes sont portés par la couche `road` (pas de `road_label`).
+          'source-layer': 'road',
+          minzoom: 11,
+          layout: {
+            'symbol-placement': 'line',
+            'text-field': ['coalesce', ['get', 'name_fr'], ['get', 'name_en'], ['get', 'name']],
+            'text-font': ['DIN Pro Medium', 'Arial Unicode MS Regular'],
+            'text-size': ['interpolate', ['linear'], ['zoom'], 11, 10, 16, 13],
+          },
+          paint: {
+            'text-color': palette.labelMuted,
+            'text-halo-color': palette.labelHalo,
+            'text-halo-width': 1.2,
+          },
+        },
+        {
+          id: 'snapmap-place-label',
+          type: 'symbol',
+          source: 'streets',
+          'source-layer': 'place_label',
+          layout: {
+            'text-field': ['coalesce', ['get', 'name_fr'], ['get', 'name_en'], ['get', 'name']],
+            'text-font': ['DIN Pro Bold', 'Arial Unicode MS Bold'],
+            'text-size': ['interpolate', ['linear'], ['zoom'], 4, 13, 10, 18],
+          },
+          paint: {
+            'text-color': palette.label,
+            'text-halo-color': palette.labelHalo,
+            'text-halo-width': 1.4,
+          },
+        },
+        {
+          id: 'snapmap-poi-label',
+          type: 'symbol',
+          source: 'streets',
+          'source-layer': 'poi_label',
+          minzoom: 15,
+          layout: {
+            'text-field': ['coalesce', ['get', 'name_fr'], ['get', 'name_en'], ['get', 'name']],
+            'text-font': ['DIN Pro Regular', 'Arial Unicode MS Regular'],
+            'text-size': 11,
+          },
+          paint: {
+            'text-color': palette.labelMuted,
+            'text-halo-color': palette.labelHalo,
+            'text-halo-width': 1,
+          },
+        },
+      ],
+    };
+  }
+
+  private restorePhotoSource(): void {
+    if (this.lastPhotos.length === 0) return;
+    this.renderPhotoSource(this.lastPhotos);
+  }
+
+  private renderPhotoSource(photos: ReadonlyArray<UserPhoto>): void {
+    const map: mapboxgl.Map | undefined = this.map;
+    if (!map || !map.isStyleLoaded()) return;
 
     const located: LocatedPhoto[] = photos.filter(
       (photo: UserPhoto): photo is LocatedPhoto => photo.lat !== null && photo.lng !== null,
@@ -291,32 +621,78 @@ export class MapService {
       paint: { 'circle-radius': 0, 'circle-opacity': 0 },
     });
 
-    map.on('render', () => this.updateMarkers());
+    if (!this.isRenderListenerBound) {
+      map.on('render', () => this.updateMarkers());
+      this.isRenderListenerBound = true;
+    }
     this.updateMarkers();
   }
 
   /**
-   * Method destroy
-   * @method destroy
+   * Method focusOn
+   * @method focusOn
    *
    * @description
-   * Tears down all markers and the map instance.
+   * Smoothly recenters the map on the given coordinates (e.g. a search result).
    *
    * @access public
-   * @since 1.0.0
+   * @since 2.0.0
+   *
+   * @param {readonly [number, number]} coordinates - The `[lng, lat]` to fly to.
+   * @param {number} [zoom] - The target zoom level.
    *
    * @returns {void} Nothing.
    */
-  public destroy(): void {
-    for (const marker of Object.values(this.markersOnScreen)) marker.remove();
-    this.markersOnScreen = {};
-    this.clearSpider();
-    this.map?.remove();
-    this.map = undefined;
+  public focusOn(coordinates: readonly [number, number], zoom = 15): void {
+    this.map?.flyTo({ center: [coordinates[0], coordinates[1]], zoom, duration: 700 });
   }
-  //#endregion
 
-  //#region Private Methods
+  /**
+   * Method setUserLocation
+   * @method setUserLocation
+   *
+   * @description
+   * Plots (or moves) the pulsing "my position" marker and remembers the position
+   * so the recenter control can fly back to it.
+   *
+   * @access public
+   * @since 4.0.0
+   *
+   * @param {readonly [number, number]} coordinates - The user `[lng, lat]`.
+   *
+   * @returns {void} Nothing.
+   */
+  public setUserLocation(coordinates: readonly [number, number]): void {
+    const map: mapboxgl.Map | undefined = this.map;
+    if (!map) return;
+
+    this.userCenter = [coordinates[0], coordinates[1]];
+    if (this.userMarker) {
+      this.userMarker.setLngLat(this.userCenter);
+      return;
+    }
+
+    const element: HTMLDivElement = document.createElement('div');
+    element.className = 'user-dot';
+    this.userMarker = new mapboxgl.Marker({ element }).setLngLat(this.userCenter).addTo(map);
+  }
+
+  /**
+   * Method recenter
+   * @method recenter
+   *
+   * @description
+   * Flies back to the user's position (no-op if unknown).
+   *
+   * @access public
+   * @since 4.0.0
+   *
+   * @returns {void} Nothing.
+   */
+  public recenter(): void {
+    if (this.userCenter) this.focusOn(this.userCenter);
+  }
+
   /**
    * Method updateMarkers
    * @method updateMarkers
@@ -390,7 +766,7 @@ export class MapService {
       event.stopPropagation();
       this.onPhotoOpen?.(id);
     });
-    return new mapboxgl.Marker({ element }).setLngLat(coordinates);
+    return new mapboxgl.Marker({ element, anchor: 'bottom' }).setLngLat(coordinates);
   }
 
   /**
@@ -418,7 +794,7 @@ export class MapService {
     element.className = 'photo-pin cluster-pin';
 
     const badge: HTMLSpanElement = document.createElement('span');
-    badge.className = 'cluster-badge';
+    badge.className = count > 99 ? 'cluster-badge is-max' : 'cluster-badge';
     badge.textContent = count > 99 ? '99+' : String(count);
     element.append(badge);
 
@@ -431,7 +807,7 @@ export class MapService {
       this.onClusterClick(clusterId, count, coordinates);
     });
 
-    return new mapboxgl.Marker({ element }).setLngLat(coordinates);
+    return new mapboxgl.Marker({ element, anchor: 'bottom' }).setLngLat(coordinates);
   }
 
   /**
