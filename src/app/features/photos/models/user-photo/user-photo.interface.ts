@@ -39,7 +39,8 @@ export interface UserPhoto {
    * Property webviewPath
    *
    * @description
-   * Displayable image as a base64 data URL.
+   * Displayable image: a base64 data URL for captured photos, or a bundled
+   * `assets/` path for demo seed photos.
    *
    * @since 1.0.0
    *

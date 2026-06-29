@@ -2,7 +2,7 @@ import { inject, Injectable, type Signal, signal, type WritableSignal } from '@a
 import { Camera, type MediaResult } from '@capacitor/camera';
 import { GeolocationService } from '@core/geolocation';
 import type { Coordinates } from '@core/geolocation';
-import { PhotoStorageService } from '@features/photos/data-access';
+import { buildDemoPhotos, PhotoStorageService } from '@features/photos/data-access';
 import type { UserPhoto } from '@features/photos/models';
 import type { PhotoLibrary } from '@features/photos/ports/photo-library';
 
@@ -156,6 +156,10 @@ export class PhotoService implements PhotoLibrary {
   public async loadSaved(force = false): Promise<void> {
     if (this.loaded && !force) return;
     this.list = await this.storage.load();
+    // No real capture yet (fresh install, simulator/browser): showcase the app
+    // with bundled demo photos. They are never persisted, so a real capture
+    // permanently replaces them. See {@link buildDemoPhotos}.
+    if (this.list.length === 0) this.list = buildDemoPhotos();
     this.sync();
     this.loaded = true;
   }
